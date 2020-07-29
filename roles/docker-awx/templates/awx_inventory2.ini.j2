@@ -20,14 +20,25 @@ dockerhub_base={{awx_dockerhub_base}}
 # Kubernetes Install
 # kubernetes_context=test-cluster
 # kubernetes_namespace=awx
-# tiller_namespace=kube-system
 # Optional Kubernetes Variables
+# pg_image_registry=docker.io
+# pg_serviceaccount=awx
+# pg_volume_capacity=5
 # pg_persistence_storageClass=StorageClassName
 # pg_cpu_limit=1000
 # pg_mem_limit=2
 
+# Kubernetes Ingress Configuration
+# You can use the variables below to configure Kubernetes Ingress
+# Set hostname
+# kubernetes_ingress_hostname=awx.example.org
+# Add annotations. The example below shows an annotation to be used with Traefik but other Ingress controllers are also supported
+# kubernetes_ingress_annotations={'kubernetes.io/ingress.class': 'traefik', 'traefik.ingress.kubernetes.io/redirect-entry-point': 'https'}
+# Specify a secret for TLS termination
+# kubernetes_ingress_tls_secret=awx-cert
+
 # Kubernetes and Openshift Install Resource Requests
-# These are the request and limit values for a pod's container for task/web/rabbitmq/memcached/management.
+# These are the request and limit values for a pod's container for task/web/redis/management.
 # The total amount of requested resources for a pod is the sum of all
 # resources requested by all containers in the pod
 # A cpu_request of 1500 is 1.5 cores for the container to start out with.
@@ -41,10 +52,8 @@ dockerhub_base={{awx_dockerhub_base}}
 # task_mem_limit=4
 # web_cpu_limit=1000
 # web_mem_limit=2
-# rabbitmq_cpu_limit=1000
-# rabbitmq_mem_limit=3
-# memcached_cpu_limit=1000
-# memcached_mem_limit=2
+# redis_cpu_limit=1000
+# redis_mem_limit=3
 # management_cpu_limit=2000
 # management_mem_limit=2
 
@@ -53,12 +62,11 @@ awx_task_hostname={{awx_task_hostname}}
 awx_web_hostname={{awx_web_hostname}}
 postgres_data_dir={{awx_pg_data_dir}}
 host_port={{ awx_port }}
+#host_port_ssl=444
 docker_compose_dir=/opt/awxcompose
 
 # Required for Openshift when building the image on your own
 # Optional for Openshift if using Dockerhub or another prebuilt registry
-# Required for Standalone Docker Install if building the image on your own
-# Optional for Standalone Docker Install if using Dockerhub or another prebuilt registry
 # Required for Docker Compose Install if building the image on your own
 # Optional for Docker Compose Install if using Dockerhub or another prebuilt registry
 # Define if you want the image pushed to a registry. The container definition will also use these images
@@ -66,10 +74,6 @@ docker_compose_dir=/opt/awxcompose
 # docker_registry_repository=awx
 # docker_registry_username=developer
 
-
-# Docker_image will not attempt to push to remote if the image already exists locally
-# Set this to true to delete images from docker on the build host so that they are pushed to the remote repository
-# docker_remove_local_images=False
 
 # Set pg_hostname if you have an external postgres server, otherwise
 # a new postgres service will be created
@@ -82,9 +86,9 @@ pg_database={{awx_pg_database}}
 pg_port={{awx_pg_port}}
 #pg_sslmode={{awx_pg_sslmode}}
 
-# RabbitMQ Configuration
-rabbitmq_password={{rabbitmq_password}}
-rabbitmq_erlang_cookie={{rabbitmq_erlang_cookie}}
+# The following variable is only required when using the provided
+# containerized postgres deployment on OpenShift
+# pg_admin_password=postgrespass
 
 # Use a local distribution build container image for building the AWX package
 # This is helpful if you don't want to bother installing the build-time dependencies as
@@ -111,9 +115,9 @@ create_preload_data=False
 secret_key={{awx_secret}}
 
 # Build AWX with official logos
-# Requires cloning awx-logos repo into the project root.
+# Requires cloning awx-logos repo as a sibling of this project.
 # Review the trademark guidelines at https://github.com/ansible/awx-logos/blob/master/TRADEMARKS.md
-# awx_official=false
+awx_official=true
 
 # Proxy
 #http_proxy=http://proxy:3128
@@ -130,10 +134,14 @@ secret_key={{awx_secret}}
 # it manages from the docker host, you can set this to turn it into a volume for the container.
 #project_data_dir=/var/lib/awx/projects
 
+# AWX custom virtual environment folder. Only usable for local install.
+#custom_venv_dir=/opt/my-envs/
+
 # CA Trust directory. If you need to provide custom CA certificates, supplying
 # this variable causes this directory on the host to be bind mounted over
 # /etc/pki/ca-trust in the awx_task and awx_web containers.
-# NOTE: only obeyed in local_docker install
+# If you are deploying on openshift or kubernetes, set the variable to /etc/pki/ca-trust instead,
+# as the awx_web and awx_task containers will not run the `update-ca-trust` command.
 #ca_trust_dir=/etc/pki/ca-trust/source/anchors
 
 # Include /etc/nginx/awx_extra.conf
@@ -141,3 +149,19 @@ secret_key={{awx_secret}}
 # which makes include "optional" - i.e. not fail
 # if file is absent
 #extra_nginx_include="/etc/nginx/awx_extra[.]conf"
+
+# Docker compose explicit subnet. Set to avoid overlapping your existing LAN networks.
+#docker_compose_subnet="172.17.0.1/16"
+#
+# Allow for different docker logging drivers
+# By Default; the logger will be json-file, however you can override
+# that by uncommenting the docker_logger below.
+# Be aware that journald may rate limit your log messages if you choose it.
+# See: https://docs.docker.com/config/containers/logging/configure/
+# docker_logger=journald
+#
+
+# Add extra hosts to docker compose file. This might be necessary to
+# sneak in servernames. For exmaple for DMZ self-signed CA certificates.
+# Equivialent to using the --add-host parameter with "docker run".
+#docker_compose_extra_hosts="otherserver.local:192.168.0.1,ldap-server.local:192.168.0.2"
