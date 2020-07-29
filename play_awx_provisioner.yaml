@@ -12,4 +12,4 @@
     - nginx-default
     - letsencrypt-certs
     - docker-awx #need to execute initial container install 
-    - nginx-awx
+    #- nginx-awx
