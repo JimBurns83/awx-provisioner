@@ -4,6 +4,7 @@
     repo: "ppa:ansible/ansible"
     state: present
     update_cache: yes
+  ignore_errors: yes
     #validate_certs: yes
 #- name: Update apt-get
 #  become: true
@@ -15,7 +16,7 @@
   apt:
     name: "{{item}}"
   with_items:
-    - ansible 
+    #- ansible 
     - docker 
     - docker.io 
     - git 
