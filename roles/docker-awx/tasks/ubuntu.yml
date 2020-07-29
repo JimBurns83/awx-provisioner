@@ -16,7 +16,7 @@
   apt:
     name: "{{item}}"
   with_items:
-    #- ansible 
+    #- ansible #should be installed via pip3 to ensure behaviour
     - docker 
     - docker.io 
     - git 
