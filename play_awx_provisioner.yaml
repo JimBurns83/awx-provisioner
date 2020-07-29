@@ -1,0 +1,7 @@
+---
+- name: AWX Provisioner
+  hosts: 127.0.0.1
+  connection: local
+  roles:
+    - ansible-cfg
+    - terraform-role-master

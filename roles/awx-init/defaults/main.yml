@@ -1,0 +1,3 @@
+---
+# defaults file for awx-init
+basedir: "/opt/awx"

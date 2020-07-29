@@ -1,0 +1,21 @@
+---
+# defaults file for ansible-cfg
+ansible_config_root: "/etc/ansible"
+ansible_config_file: "/etc/ansible/ansible.cfg"
+ansible_password_file: "/etc/ansible/ansible-pass-file"
+ansible_hosts_file: "/etc/ansible/hosts"
+ansible_cfg_entries:
+  defaults:
+    forks: 5
+    timeout: 10
+    poll_interval: 15
+    sudo_user: root
+    transport: paramiko
+    remote_port: 22
+    sudo_exe: sudo
+    private_key_file: ~/.ssh/hephaestus
+    ansible_managed: "Ansible managed: {file} modified on %Y-%m-%d %H:%M:%S by {uid} on {host}"
+    callback_whitelist : profile_tasks
+    vault_password_file: "/etc/ansible/ansible-pass-file"
+  ssh_connection:
+    ssh_args: "-o ControlMaster=auto -o ControlPersist=60s -o ControlPath=/tmp/ansible-ssh-%h-%p-%r"
