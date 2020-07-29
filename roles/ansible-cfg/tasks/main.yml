@@ -66,43 +66,43 @@
   loop_control:
     loop_var: ansible_cfg_section
   when: ansible_cfg_entries | default(None) != None
-- name: ensure symbolic link exists for py
-  file:
-      path:  "/usr/bin/ss64password" # required. Path to the file being managed.
-      src: "~{{ansible_env.SUDO_USER}}/github.com/JimBurns83/Hephaestus/ss64password.py"  # not required. path of the file to link to (applies only to C(state=link) and C(state=hard)). Will accept absolute, relative and nonexisting paths. Relative paths are relative to the file being created (C(path)) which is how the UNIX command C(ln -s SRC DEST) treats relative paths.
-      #selevel: s0 # not required. Level part of the SELinux file context. This is the MLS/MCS attribute, sometimes known as the C(range). C(_default) feature works as for I(seuser).
-      #force: no # not required. force the creation of the symlinks in two cases: the source file does not exist (but will appear later); the destination exists and is a file (so, we need to unlink the "path" file and create symlink to the "src" file in place of it).
-      #unsafe_writes: no # not required. By default this module uses atomic operations to prevent data corruption or inconsistent reads from the target files, but sometimes systems are configured or just broken in ways that prevent this. One example is docker mounted files, which cannot be updated atomically from inside the container and can only be written in an unsafe manner.,This option allows Ansible to fall back to unsafe methods of updating files when atomic operations fail (however, it doesn't force Ansible to perform unsafe writes). IMPORTANT! Unsafe writes are subject to race conditions and can lead to data corruption.
-      #access_time: undefined # not required. This parameter indicates the time the file's access time should be set to,Should be C(preserve) when no modification is required, C(YYYYMMDDHHMM.SS) when using default time format, or C(now),Default is None meaning that C(preserve) is the default for C(state=[file,directory,link,hard]) and C(now) is default for C(state=touch)
-      #seuser: undefined # not required. User part of SELinux file context. Will default to system policy, if applicable. If set to C(_default), it will use the C(user) portion of the policy if available.
-      #recurse: no # not required. recursively set the specified file attributes (applies only to directories)
-      #serole: undefined # not required. Role part of SELinux file context, C(_default) feature works as for I(seuser).
-      #access_time_format: %Y%m%d%H%M.%S # not required. When used with C(access_time), indicates the time format that must be used.,Based on default Python format (see time.strftime doc)
-      #group: undefined # not required. Name of the group that should own the file/directory, as would be fed to I(chown).
-      #modification_time: undefined # not required. This parameter indicates the time the file's modification time should be set to,Should be C(preserve) when no modification is required, C(YYYYMMDDHHMM.SS) when using default time format, or C(now),Default is None meaning that C(preserve) is the default for C(state=[file,directory,link,hard]) and C(now) is default for C(state=touch)
-      state: link # not required. choices: absent;directory;file;hard;link;touch. If C(directory), all intermediate subdirectories will be created if they do not exist. Since Ansible 1.7 they will be created with the supplied permissions. If C(file), the file will NOT be created if it does not exist; see the C(touch) value or the M(copy) or M(template) module if you want that behavior.  If C(link), the symbolic link will be created or changed. Use C(hard) for hardlinks. If C(absent), directories will be recursively deleted, and files or symlinks will be unlinked. Note that C(absent) will not cause C(file) to fail if the C(path) does not exist as the state did not change. If C(touch) (new in 1.4), an empty file will be created if the C(path) does not exist, while an existing file or directory will receive updated file access and modification times (similar to the way `touch` works from the command line).
-      #mode: undefined # not required. Mode the file or directory should be. For those used to I(/usr/bin/chmod) remember that modes are actually octal numbers. You must either add a leading zero so that Ansible's YAML parser knows it is an octal number (like C(0644) or C(01777)) or quote it (like C('644') or C('1777')) so Ansible receives a string and can do its own conversion from string into number.  Giving Ansible a number without following one of these rules will end up with a decimal number which will have unexpected results. As of version 1.8, the mode may be specified as a symbolic mode (for example, C(u+rwx) or C(u=rw,g=r,o=r)).
-      #modification_time_format: %Y%m%d%H%M.%S # not required. When used with C(modification_time), indicates the time format that must be used.,Based on default Python format (see time.strftime doc)
-      #owner: undefined # not required. Name of the user that should own the file/directory, as would be fed to I(chown).
-      #follow: yes # not required. This flag indicates that filesystem links, if they exist, should be followed.,Previous to Ansible 2.5, this was C(no) by default.
-      #attributes: undefined # not required. Attributes the file or directory should have. To get supported flags look at the man page for I(chattr) on the target system. This string should contain the attributes in the same order as the one displayed by I(lsattr).,C(=) operator is assumed as default, otherwise C(+) or C(-) operators need to be included in the string.
-      #setype: undefined # not required. Type part of SELinux file context, C(_default) feature works as for I(seuser).
-- name: Generate Vault Password
-  shell: "ss64password ansible_vault < ~{{ansible_env.SUDO_USER}}/.janus/Qq1qGbqYQURXglMEA2EE"
-  register: genpass
-- name: "write {{ansible_password_file}}"
-  copy:
-    content: "{{genpass.stdout_lines[0]}}"
-    dest: "{{ansible_password_file}}"
-- name: set vault_password to {{genpass.stdout_lines[0]}}
-  ini_file:
-        section: "defaults" # required. Section name in INI file. This is added if C(state=present) automatically when a single value is being set.,If left empty or set to `null`, the I(option) will be placed before the first I(section). Using `null` is also required if the config format does not support sections.
-        path: "{{ansible_config_file}}" # required. Path to the INI-style file; this file is created if required.,Before 2.3 this option was only usable as I(dest).
-        #group: "{{odoo.shell_group}}" # not required. Name of the group that should own the file/directory, as would be fed to I(chown).
-        #owner: "{{odoo_environment_name}}" # not required. Name of the user that should own the file/directory, as would be fed to I(chown).
-        option: "vault_password" # not required. If set (required for changing a I(value)), this is the name of the option.,May be omitted if adding/removing a whole I(section).
-        value: "{{genpass.stdout_lines[0]}}" # not required. The string value to be associated with an I(option). May be omitted when removing an I(option).
-        state: present # not required. choices: absent;present. If set to C(absent) the option or section will be removed if present instead of created.
-        #mode: 0644 # not required. Mode the file or directory should be. For those used to I(/usr/bin/chmod) remember that modes are actually octal numbers. You must either add a leading zero so that Ansible's YAML parser knows it is an octal number (like C(0644) or C(01777)) or quote it (like C('644') or C('1777')) so Ansible receives a string and can do its own conversion from string into number.  Giving Ansible a number without following one of these rules will end up with a decimal number which will have unexpected results. As of version 1.8, the mode may be specified as a symbolic mode (for example, C(u+rwx) or C(u=rw,g=r,o=r)).
-        #backup: yes # not required. Create a backup file including the timestamp information so you can get the original file back if you somehow clobbered it incorrectly.
-        create: yes # not required. If set to 'no', the module will fail if the file does not already exist. By default it will create the file if it is missing.
+#- name: ensure symbolic link exists for py
+#  file:
+#      path:  "/usr/bin/ss64password" # required. Path to the file being managed.
+#      src: "~{{ansible_env.SUDO_USER}}/github.com/JimBurns83/Hephaestus/ss64password.py"  # not required. path of the file to link to (applies only to C(state=link) and C(state=hard)). Will accept absolute, relative and nonexisting paths. Relative paths are relative to the file being created (C(path)) which is how the UNIX command C(ln -s SRC DEST) treats relative paths.
+#      #selevel: s0 # not required. Level part of the SELinux file context. This is the MLS/MCS attribute, sometimes known as the C(range). C(_default) feature works as for I(seuser).
+#      #force: no # not required. force the creation of the symlinks in two cases: the source file does not exist (but will appear later); the destination exists and is a file (so, we need to unlink the "path" file and create symlink to the "src" file in place of it).
+#      #unsafe_writes: no # not required. By default this module uses atomic operations to prevent data corruption or inconsistent reads from the target files, but sometimes systems are configured or just broken in ways that prevent this. One example is docker mounted files, which cannot be updated atomically from inside the container and can only be written in an unsafe manner.,This option allows Ansible to fall back to unsafe methods of updating files when atomic operations fail (however, it doesn't force Ansible to perform unsafe writes). IMPORTANT! Unsafe writes are subject to race conditions and can lead to data corruption.
+#      #access_time: undefined # not required. This parameter indicates the time the file's access time should be set to,Should be C(preserve) when no modification is required, C(YYYYMMDDHHMM.SS) when using default time format, or C(now),Default is None meaning that C(preserve) is the default for C(state=[file,directory,link,hard]) and C(now) is default for C(state=touch)
+#      #seuser: undefined # not required. User part of SELinux file context. Will default to system policy, if applicable. If set to C(_default), it will use the C(user) portion of the policy if available.
+#      #recurse: no # not required. recursively set the specified file attributes (applies only to directories)
+#      #serole: undefined # not required. Role part of SELinux file context, C(_default) feature works as for I(seuser).
+#      #access_time_format: %Y%m%d%H%M.%S # not required. When used with C(access_time), indicates the time format that must be used.,Based on default Python format (see time.strftime doc)
+#      #group: undefined # not required. Name of the group that should own the file/directory, as would be fed to I(chown).
+#      #modification_time: undefined # not required. This parameter indicates the time the file's modification time should be set to,Should be C(preserve) when no modification is required, C(YYYYMMDDHHMM.SS) when using default time format, or C(now),Default is None meaning that C(preserve) is the default for C(state=[file,directory,link,hard]) and C(now) is default for C(state=touch)
+#      state: link # not required. choices: absent;directory;file;hard;link;touch. If C(directory), all intermediate subdirectories will be created if they do not exist. Since Ansible 1.7 they will be created with the supplied permissions. If C(file), the file will NOT be created if it does not exist; see the C(touch) value or the M(copy) or M(template) module if you want that behavior.  If C(link), the symbolic link will be created or changed. Use C(hard) for hardlinks. If C(absent), directories will be recursively deleted, and files or symlinks will be unlinked. Note that C(absent) will not cause C(file) to fail if the C(path) does not exist as the state did not change. If C(touch) (new in 1.4), an empty file will be created if the C(path) does not exist, while an existing file or directory will receive updated file access and modification times (similar to the way `touch` works from the command line).
+#      #mode: undefined # not required. Mode the file or directory should be. For those used to I(/usr/bin/chmod) remember that modes are actually octal numbers. You must either add a leading zero so that Ansible's YAML parser knows it is an octal number (like C(0644) or C(01777)) or quote it (like C('644') or C('1777')) so Ansible receives a string and can do its own conversion from string into number.  Giving Ansible a number without following one of these rules will end up with a decimal number which will have unexpected results. As of version 1.8, the mode may be specified as a symbolic mode (for example, C(u+rwx) or C(u=rw,g=r,o=r)).
+#      #modification_time_format: %Y%m%d%H%M.%S # not required. When used with C(modification_time), indicates the time format that must be used.,Based on default Python format (see time.strftime doc)
+#      #owner: undefined # not required. Name of the user that should own the file/directory, as would be fed to I(chown).
+#      #follow: yes # not required. This flag indicates that filesystem links, if they exist, should be followed.,Previous to Ansible 2.5, this was C(no) by default.
+#      #attributes: undefined # not required. Attributes the file or directory should have. To get supported flags look at the man page for I(chattr) on the target system. This string should contain the attributes in the same order as the one displayed by I(lsattr).,C(=) operator is assumed as default, otherwise C(+) or C(-) operators need to be included in the string.
+#      #setype: undefined # not required. Type part of SELinux file context, C(_default) feature works as for I(seuser).
+#- name: Generate Vault Password
+#  shell: "ss64password ansible_vault < ~{{ansible_env.SUDO_USER}}/.janus/Qq1qGbqYQURXglMEA2EE"
+#  register: genpass
+#- name: "write {{ansible_password_file}}"
+#  copy:
+#    content: "{{genpass.stdout_lines[0]}}"
+#    dest: "{{ansible_password_file}}"
+#- name: set vault_password to {{genpass.stdout_lines[0]}}
+#  ini_file:
+#        section: "defaults" # required. Section name in INI file. This is added if C(state=present) automatically when a single value is being set.,If left empty or set to `null`, the I(option) will be placed before the first I(section). Using `null` is also required if the config format does not support sections.
+#        path: "{{ansible_config_file}}" # required. Path to the INI-style file; this file is created if required.,Before 2.3 this option was only usable as I(dest).
+#        #group: "{{odoo.shell_group}}" # not required. Name of the group that should own the file/directory, as would be fed to I(chown).
+#        #owner: "{{odoo_environment_name}}" # not required. Name of the user that should own the file/directory, as would be fed to I(chown).
+#        option: "vault_password" # not required. If set (required for changing a I(value)), this is the name of the option.,May be omitted if adding/removing a whole I(section).
+#        value: "{{genpass.stdout_lines[0]}}" # not required. The string value to be associated with an I(option). May be omitted when removing an I(option).
+#        state: present # not required. choices: absent;present. If set to C(absent) the option or section will be removed if present instead of created.
+#        #mode: 0644 # not required. Mode the file or directory should be. For those used to I(/usr/bin/chmod) remember that modes are actually octal numbers. You must either add a leading zero so that Ansible's YAML parser knows it is an octal number (like C(0644) or C(01777)) or quote it (like C('644') or C('1777')) so Ansible receives a string and can do its own conversion from string into number.  Giving Ansible a number without following one of these rules will end up with a decimal number which will have unexpected results. As of version 1.8, the mode may be specified as a symbolic mode (for example, C(u+rwx) or C(u=rw,g=r,o=r)).
+#        #backup: yes # not required. Create a backup file including the timestamp information so you can get the original file back if you somehow clobbered it incorrectly.
+#        create: yes # not required. If set to 'no', the module will fail if the file does not already exist. By default it will create the file if it is missing.
