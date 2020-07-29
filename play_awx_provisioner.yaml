@@ -4,4 +4,3 @@
   connection: local
   roles:
     - ansible-cfg
-    - terraform-role-master
