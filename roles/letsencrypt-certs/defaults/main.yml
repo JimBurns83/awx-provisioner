@@ -1,0 +1,16 @@
+---
+# defaults file for letsencrypt-certs
+letsencrypt_domains:
+  #"{{ansible_host}}":
+  #  domains:
+  #    - "{{ansible_host}}"
+  #  enabled: yes
+  #"example.com":
+    #domains:
+    #  - "example.com"
+    #  - "alt.example.com"
+    #  - "example.co.uk"
+    #enabled: "yes"
+#letsencrypt_email: certbot@{{org-domain}}
+letsencrypt_email: james.burns@nice.org.uk
+ssl_root: /opt/ssl

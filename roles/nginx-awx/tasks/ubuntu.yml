@@ -1,0 +1,17 @@
+---
+- name: Get SSL paths for template
+  set_fact:
+    ssl_certificate: "{{ssl_root}}/live/{{awx.domain_name}}/{{ssl_available.fullchain_name}}"
+    ssl_certificate_key: "{{ssl_root}}/live/{{awx.domain_name}}/{{ssl_available.key_name}}"
+
+- name: Install nginx site for letsencrypt requests
+  template:
+    src: templates/awx-orig.j2
+    dest: "{{nginx_sites_available}}/{{awx.domain_name}}"
+- name: Enable nginx site for letsencrypt requests
+  file:
+    src: "{{nginx_sites_available}}/{{awx.domain_name}}"
+    dest: "{{nginx_sites_enabled}}/{{awx.domain_name}}"
+    state: link
+  notify: reload nginx
+

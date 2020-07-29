@@ -1,0 +1,48 @@
+---
+- name: Install nginx
+  apt:
+    pkg: nginx
+    state: present
+- name: Make nginx Cache Dir
+  file:
+    path: /var/www/cache
+    owner: root
+    group: root
+    state: directory
+- name: Make nginx Cache Temp Dir
+  file:
+    path: /var/www/cache/tmp
+    owner: root
+    group: root
+    state: directory
+- name: install letsencrypt
+  apt: 
+    name: letsencrypt 
+    state: latest
+- name: create letsencrypt directory
+  file: 
+    name: /var/www/letsencrypt 
+    state: directory
+- name: Remove default nginx config
+  file: 
+    name: /etc/nginx/sites-enabled/default 
+    state: absent
+- name: "Install system nginx config"
+  template:
+    src: "templates/nginx.conf.j2"
+    dest: "{{nginx_conf_path}}"
+- name: Install nginx site for letsencrypt requests
+  template:
+    src: templates/nginx-http.j2
+    dest: "{{nginx_sites_available}}/http"
+- name: Generate dhparams
+  shell: openssl dhparam -out /etc/nginx/dhparams.pem 2048
+  args:
+    creates: /etc/nginx/dhparams.pem
+- name: Enable nginx site for letsencrypt requests
+  file:
+    src: "{{nginx_sites_available}}/http"
+    dest: "{{nginx_sites_enabled}}/http"
+    state: link
+  notify: reload nginx
+

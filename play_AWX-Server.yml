@@ -1,0 +1,16 @@
+---
+- hosts: awx-server
+  gather_facts: true
+  become: true
+  roles:
+    #- locale
+    #- shell-users
+    #- postgres
+    #- postgres-config
+    #- postgres-su
+    #- postgres-users
+    ##- pgbouncer-rds
+    - nginx-default
+    - letsencrypt-certs
+    - docker-awx #need to execute initial container install 
+    - nginx-awx

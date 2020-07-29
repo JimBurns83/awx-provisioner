@@ -1,0 +1,26 @@
+---
+# tasks file for letsencrypt-certs
+- name: "Create Directory Structure"
+  file:
+    path: "{{item_dir}}"
+    owner: "root"
+    group: "root"
+    state: directory
+  with_items: 
+   - "{{ssl_root}}"
+   - "{{ssl_root}}/original"
+   - "{{ssl_root}}/live"
+   - "{{ssl_root}}/available"
+  loop_control:
+    loop_var: item_dir
+#- name: Ensure Letsencrypt Runs {{letsencrypt_domains}}
+#  set_fact: 
+#    letsencrypt_domains: "{{ansible_host}}"
+  when: letsencrypt_domains|default(none) == None 
+- include_tasks: itter-le-certs.yml
+  with_items: "{{ letsencrypt_domains }}"
+  loop_control:
+    loop_var: item_letsencrypt
+  tags:
+  - Install  
+  when: letsencrypt_domains|default(ansible_host) != None 

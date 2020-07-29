@@ -1,6 +1,15 @@
 ---
-- name: AWX Provisioner
+- name: Configure Local Ansible
   hosts: 127.0.0.1
   connection: local
   roles:
     - ansible-cfg
+#- name: AWX PG Server
+- name: AWX Provisioner
+  hosts: 127.0.0.1
+  connection: local
+  roles:
+    - nginx-default
+    - letsencrypt-certs
+    - docker-awx #need to execute initial container install 
+    - nginx-awx

@@ -1,0 +1,22 @@
+server_tokens off;
+
+server {
+    listen 80 default_server;
+    #server_name {{ nginx_default_server_name }};
+    #Location for LetsEncrypt
+    location /.well-known/acme-challenge {
+        root /var/www/letsencrypt;
+        try_files $uri $uri/ =404;
+    }
+    location /nginx_status {
+        stub_status;
+        allow 127.0.0.1;	#only allow requests from localhost
+ 	    deny all;		#deny all other hosts	
+    }
+    #Default Location
+    location / {
+        rewrite ^ https://{{ nginx_default_server_name }}$request_uri? redirect;
+    }
+    location = /webcel-check.ashx { access_log off; log_not_found off; }
+}
+

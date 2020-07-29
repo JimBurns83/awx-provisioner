@@ -1,0 +1,71 @@
+---
+- name: "Ensure Repo is present"
+  apt_repository:
+    repo: "ppa:ansible/ansible"
+    state: present
+    update_cache: yes
+    #validate_certs: yes
+#- name: Update apt-get
+#  become: true
+#  apt:
+#    update_cache: true
+#  tags:
+#    - Install
+- name: "install docker requirements"
+  apt:
+    name: "{{item}}"
+  with_items:
+    - ansible 
+    - docker 
+    - docker.io 
+    - git 
+    - python3-pip
+    - python-pip
+- name: "pip install docker"
+  pip:
+    name: "{{item}}" # not required. The name of a Python library to install or the url(bzr+,hg+,git+,svn+) of the remote package.,This can be a list (since 2.2) and contain version specifiers (since 2.7).  
+    executable: pip # not required. The explicit executable or a pathname to the executable to be used to run pip for a specific version of Python installed in the system. For example C(pip-3.3), if there are both Python 2.7 and 3.3 installations in the system and you want to run pip for the Python 3.3 installation. It cannot be specified together with the 'virtualenv' parameter (added in 2.1). By default, it will take the appropriate version for the python interpreter use by ansible, e.g. pip3 on python 3, and pip2 or pip on python 2.
+    #extra_args: undefined # not required. Extra arguments passed to pip.
+    state: present # not required. choices: absent;forcereinstall;latest;present. The state of module,The 'forcereinstall' option is only available in Ansible 2.1 and above.
+    #version: undefined # not required. The version number to install of the Python library specified in the I(name) parameter.
+  with_items:
+    - docker
+    - docker-compose
+#- name: "Pip Install docker-py"
+#  pip:
+#    name: "docker-py"
+- name: Restart Docker Service
+  service:
+    name: "docker"
+    enabled: yes
+    state: started
+- name: "create install folder"
+  file:
+    path: "~/awx-install/"
+    state: directory
+- name: "git clone stuff"
+  git:
+    repo: "{{item.repo}}"
+    dest: "~/awx-install/{{item.name}}"
+    version: "{{item.version}}"
+    force: yes
+  with_items:
+    - repo: "{{awx_repo}}/awx.git"
+      version: "{{awx_version}}"
+      name: "awx"
+    - repo: "{{awx_repo}}/awx-logos.git"
+      version: "master"
+      name: "awx-logos"
+  ignore_errors: yes
+- name: "Provide AWX Inventory"
+  template: 
+    src: templates/awx_inventory.ini.j2
+    dest: "~/awx-install/awx/installer/inventory"
+    #pip uninstall docker-py
+    #pip install docker
+    #pip install docker-compose
+    #apt-get install python3-pip
+    #python -m pip uninstall docker-py
+    #python -m pip uninstall docker
+    #python -m pip install docker
+    #docker ps -q | xargs -n 1 docker inspect --format '{{.HostConfig.RestartPolicy.Name}} {{ .NetworkSettings.IPAddress }} {{ .Name }}' | sed 's/ \// /'

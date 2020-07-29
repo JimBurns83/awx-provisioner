@@ -1,0 +1,35 @@
+---
+- name: test {{ansible_host}}
+  debug:
+    msg: "{{letsencrypt_domains}}"
+#- name: get domain string
+#  set_fact:
+#    le_domains: (item_letsencrypt letsencrypt_domains[(item_letsencrypt)].domains | join ",")| default(ansible_host) #untested
+- name: "Create letsencrypt certificate for {{ item_letsencrypt | default(ansible_host) }}"
+  shell: letsencrypt certonly -n --webroot -w /var/www/letsencrypt -m {{ letsencrypt_email }} --agree-tos -d {{ item_letsencrypt }} #untested
+  args:
+    creates: /etc/letsencrypt/live/{{ item_letsencrypt }}
+  tags:
+  - Install
+- name: Add letsencrypt cronjob for cert renewal and reload nginx
+  cron:
+    name: letsencrypt_renewal for {{ item_letsencrypt }}
+    special_time: weekly
+    job: letsencrypt --renew-by-default certonly -n --webroot -w /var/www/letsencrypt -m {{ letsencrypt_email }} --agree-tos -d {{ item_letsencrypt }} && service nginx reload
+  tags:
+  - Install  
+- name: test {{ansible_host}}
+  debug:
+    msg: "{{letsencrypt_domains}}"
+- name: test {{ansible_host}}
+  debug:
+    msg: "{{letsencrypt_domains[(item_letsencrypt)].enabled}}"
+- name: test {{ansible_host}}
+  debug:
+    msg: "{{letsencrypt_domains[(item_letsencrypt)].enabled  | default('no')}}"
+- name: "Enable certificate if fullchain and key are present"
+  file:
+    src: "/etc/letsencrypt/live/{{item_letsencrypt}}"
+    dest: "{{ssl_root}}/live/{{item_letsencrypt}}"
+    state: link
+  when: letsencrypt_domains[(item_letsencrypt)].enabled | default(false)
