@@ -10,7 +10,7 @@ awx_port: 81
 awx_task_hostname: awx
 awx_web_hostname: awxweb
 awx_pg_data_dir: /opt/pgdocker
-#awx_pg_hostname: "{{ansible_default_ipv4.address}}"
+awx_pg_hostname: "{{ansible_default_ipv4.address}}"
 awx_pg_username: awxpg
 awx_pg_password: AWXPGPWD
 awx_pg_port: 5432
