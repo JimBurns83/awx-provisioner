@@ -3,6 +3,8 @@ clouds:
    region_name: RegionOne
    auth:
      username: 'admin'
-     password: LetMeIn123
+     password: 'LetMeIn123'
      project_name: 'admin'
-     auth_url: 'http://192.168.178.192:5000/'
+     project_domain_name: 'Default'
+     user_domain_name: 'Default'
+     auth_url: 'http://192.168.178.192:5000/v3.0/'
