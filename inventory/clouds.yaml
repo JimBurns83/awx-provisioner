@@ -5,4 +5,4 @@ clouds:
      username: 'admin'
      password: LetMeIn123
      project_name: 'admin'
-     auth_url: 'http://192.168.178.192:5000/v3.0/'
+     auth_url: 'http://192.168.178.192:5000/'
