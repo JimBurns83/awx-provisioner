@@ -1,0 +1,7 @@
+identity_hosts:
+  infra01:
+    ip: 10.0.0.10
+  infra02:
+    ip: 10.0.0.11
+  infra03:
+    ip: 10.0.0.12
