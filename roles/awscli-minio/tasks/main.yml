@@ -1,0 +1,6 @@
+---
+# tasks file for awscli-minio
+- name: ensure awscli is installed
+  package:
+    name: awscli
+    state: present
