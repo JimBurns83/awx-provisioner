@@ -1,7 +1,7 @@
 ---
 - name: "Overwrite Default basedir of {{basedir}}"
   set_fact:
-    basedir: "~/github/AWX/"
+    basedir: "/mnt/c/Users/Hackspace/Documents/GitHub/awx-provisioner"
 - name: Create Initial Folder Structure
   file:
     path: "{{basedir}}/{{item_dir}}" # required. Path to the file being managed.

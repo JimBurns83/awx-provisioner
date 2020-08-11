@@ -1,0 +1,6 @@
+---
+- name: local awx inventory create
+  hosts: 127.0.0.1
+  connection: local
+  roles:
+    - awx-init
