@@ -1,2 +1,4 @@
 ---
-# defaults file for awscli-minio
+# defaults file for awscli
+default_id: minio
+default_secret: minio123
