@@ -25,7 +25,7 @@
   ignore_errors: yes # Possible temp issue with ubuntu archives down
 - name: Install python3-pip
   apt:
-    name: ["python3-pip", "python-pip", "python-minimal", "aptitude"] # not required. A list of package names, like C(foo), or package specifier with version, like C(foo=1.0). Name wildcards (fnmatch) like C(apt*) and version wildcards like C(foo=1.0*) are also supported.
+    name: ["python3-pip", "aptitude"] # not required. A list of package names, like C(foo), or package specifier with version, like C(foo=1.0). Name wildcards (fnmatch) like C(apt*) and version wildcards like C(foo=1.0*) are also supported.
     state: present # not required. choices: absent;build-dep;latest;present. Indicates the desired package state. C(latest) ensures that the latest version is installed. C(build-dep) ensures the package build dependencies are installed.
     install_recommends: yes # not required. Corresponds to the C(--no-install-recommends) option for I(apt). C(yes) installs recommended packages.  C(no) does not install recommended packages. By default, Ansible will use the same defaults as the operating system. Suggested packages are never installed.
 - name: get metadata
