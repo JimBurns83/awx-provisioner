@@ -4,3 +4,10 @@
   package:
     name: postgresql
     state: present
+- name: provide default config
+  template:
+    source: templates/00-default.conf.j2
+    dest: "{{postgres_confd_path}}/oo-default.conf"
+    owner: postgres
+    group: postgres
+  notify: postgres_restart
