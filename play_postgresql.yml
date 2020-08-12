@@ -4,3 +4,4 @@
   become: true
   roles:
     - postgresql-default
+    - awscli-minio
