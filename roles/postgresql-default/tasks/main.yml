@@ -24,14 +24,14 @@
 - name: "create backup of database to /backup"
   cron:
       #cron_file: undefined # not required. If specified, uses this file instead of an individual user's crontab. If this is a relative path, it is interpreted with respect to /etc/cron.d. (If it is absolute, it will typically be /etc/crontab). Many linux distros expect (and some require) the filename portion to consist solely of upper- and lower-case letters, digits, underscores, and hyphens. To use the C(cron_file) parameter you must specify the C(user) as well.
-      month: * # not required. Month of the year the job should run ( 1-12, *, */2, etc )
+      month: "*" # not required. Month of the year the job should run ( 1-12, *, */2, etc )
       #disabled: no # not required. If the job should be disabled (commented out) in the crontab.,Only has effect if C(state=present).
       job: "pg_dump -Upostgres -h 127.0.0.1 -Fc > /backup/whole_db.dump" # not required. The command to execute or, if env is set, the value of environment variable. The command should not contain line breaks. Required if state=present.
       #special_time: reboot # not required. choices: reboot;yearly;annually;monthly;weekly;daily;hourly. Special time specification nickname.
       user: root # not required. The specific user whose crontab should be modified.
       #insertafter: undefined # not required. Used with C(state=present) and C(env). If specified, the environment variable will be inserted after the declaration of specified environment variable.
       #insertbefore: undefined # not required. Used with C(state=present) and C(env). If specified, the environment variable will be inserted before the declaration of specified environment variable.
-      day: * # not required. Day of the month the job should run ( 1-31, *, */2, etc )
+      day: "*" # not required. Day of the month the job should run ( 1-31, *, */2, etc )
       minute: 0 # not required. Minute when the job should run ( 0-59, *, */2, etc )
       #name: undefined # not required. Description of a crontab entry or, if env is set, the name of environment variable. Required if state=absent. Note that if name is not set and state=present, then a new crontab entry will always be created, regardless of existing ones.
       hour: 1 # not required. Hour when the job should run ( 0-23, *, */2, etc )
@@ -43,14 +43,14 @@
 - name: "copy backup of whole database to s3"
   cron:
       #cron_file: undefined # not required. If specified, uses this file instead of an individual user's crontab. If this is a relative path, it is interpreted with respect to /etc/cron.d. (If it is absolute, it will typically be /etc/crontab). Many linux distros expect (and some require) the filename portion to consist solely of upper- and lower-case letters, digits, underscores, and hyphens. To use the C(cron_file) parameter you must specify the C(user) as well.
-      month: * # not required. Month of the year the job should run ( 1-12, *, */2, etc )
+      month: "*" # not required. Month of the year the job should run ( 1-12, *, */2, etc )
       #disabled: no # not required. If the job should be disabled (commented out) in the crontab.,Only has effect if C(state=present).
       job: "aws --endpoint-url http://192.168.178.17:9000 s3 cp /backup/whole_db.dump s3://backups/postgres/" # not required. The command to execute or, if env is set, the value of environment variable. The command should not contain line breaks. Required if state=present.
       #special_time: reboot # not required. choices: reboot;yearly;annually;monthly;weekly;daily;hourly. Special time specification nickname.
       user: root # not required. The specific user whose crontab should be modified.
       #insertafter: undefined # not required. Used with C(state=present) and C(env). If specified, the environment variable will be inserted after the declaration of specified environment variable.
       #insertbefore: undefined # not required. Used with C(state=present) and C(env). If specified, the environment variable will be inserted before the declaration of specified environment variable.
-      day: * # not required. Day of the month the job should run ( 1-31, *, */2, etc )
+      day: "*" # not required. Day of the month the job should run ( 1-31, *, */2, etc )
       minute: 5 # not required. Minute when the job should run ( 0-59, *, */2, etc )
       #name: undefined # not required. Description of a crontab entry or, if env is set, the name of environment variable. Required if state=absent. Note that if name is not set and state=present, then a new crontab entry will always be created, regardless of existing ones.
       hour: 1 # not required. Hour when the job should run ( 0-23, *, */2, etc )
