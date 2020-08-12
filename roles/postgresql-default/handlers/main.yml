@@ -2,5 +2,5 @@
 # handlers file for postgresql-default
 - name: postgres_restart
   service:
-    name: postgres
+    name: postgresql
     state: reloaded
