@@ -1,0 +1,6 @@
+---
+# tasks file for postgresql-default
+- name: install package
+  package:
+    name: postgresql
+    state: present
