@@ -4,6 +4,12 @@
   package:
     name: postgresql
     state: present
+- name: provide custom hba
+  template:
+    src: templates/pg_hba_custom.conf.j2
+    dest: "{{postgres_confd_path}}/../pg_hba_custom.conf"
+    owner: postgres
+    group: postgres
 - name: provide default config
   template:
     src: templates/00-default.conf.j2
