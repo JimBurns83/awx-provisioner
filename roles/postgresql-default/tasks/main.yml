@@ -2,7 +2,7 @@
 # tasks file for postgresql-default
 - name: install package
   package:
-    name: postgresql
+    name: "postgresql-{{postgresql_version}}"
     state: present
 - name: provide custom hba
   template:

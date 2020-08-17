@@ -1,3 +1,4 @@
 ---
 # defaults file for postgresql-default
+postgresql_version: "12"
 postgres_confd_path : "/etc/postgresql/12/main/conf.d"
