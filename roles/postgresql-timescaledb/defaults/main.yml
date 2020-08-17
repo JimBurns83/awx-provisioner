@@ -1,2 +1,3 @@
 ---
 # defaults file for postgresql-timescaledb
+postgresql_version: "12"
