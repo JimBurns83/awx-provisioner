@@ -1,10 +1,10 @@
 ---
-- hosts: bootstrap, tag_ansible_groups_bootstrap
+- hosts: all
   gather_facts: false #due to not having python packages installed yet
   become: true
   roles:
     - awx-bootstrap-init
-- hosts: bootstrap, tag_ansible_groups_bootstrap
+- hosts: all
   gather_facts: true #now python is installed
   become: true
   roles:
