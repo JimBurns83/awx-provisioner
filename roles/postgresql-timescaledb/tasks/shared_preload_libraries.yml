@@ -9,3 +9,6 @@
   register: pg_result
 - set_fact: 
     pg_settings: "{{pg_result}}"
+- debug:
+  msg: "{{pg_settings}} {{pg_result}}"
+- gather_facts: true
