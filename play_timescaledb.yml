@@ -1,0 +1,7 @@
+---
+- hosts: timescaledb
+  gather_facts: true #now python is installed
+  become: true
+  roles:
+    - postgresql-default
+    - awscli-minio

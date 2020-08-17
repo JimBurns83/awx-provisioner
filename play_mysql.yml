@@ -1,0 +1,7 @@
+---
+- hosts: mysql
+  gather_facts: true #now python is installed
+  become: true
+  roles:
+    #- mysql-default
+    - awscli-minio
