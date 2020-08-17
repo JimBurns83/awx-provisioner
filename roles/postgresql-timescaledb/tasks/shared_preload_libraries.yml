@@ -5,13 +5,15 @@
     owner: postgres
     group: postgres
 - name: try to collect facts
-  shell: 'psql -Upostgres -h127.0.0.1 -P pager=off -t -c "select concat(r.name, '' : '', r.setting) from (select name, setting from pg_settings) as r;"'
+  shell: 'psql  -P pager=off -P format=unaligned -t -c "select jsonb_object_agg(name, setting) from pg_settings;"'
+  #shell: 'psql -Upostgres -h127.0.0.1 -P pager=off -t -c "select concat(r.name, '' : '', r.setting) from (select name, setting from pg_settings) as r;"'
   #shell: 'psql -Upostgres -h127.0.0.1 -P pager=off -t -c "select concat(r.name, r.setting) from (select name, setting from pg_settings) as r;"'
   #shell: "psql -Upostgres -h127.0.0.1 -P pager=off -t -c \"select concat('\"',r.name,'\" : \"',r.setting,'\"') from (select name, setting from pg_settings) as r;\""
   register: pg_result
 - set_fact: 
-    pg_settings: "{{pg_result.stdout_lines}}"
+    pg_settings: "{{pg_result.stdout}}"
 - debug:
     msg: "{{pg_settings}}"
 - name: "Re-run setup to use custom facts"
   setup: ~
+ #psql  -P pager=off -P format=unaligned -t -c "select json_agg(r) from (select name, setting from pg_settings) as r;"
