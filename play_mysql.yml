@@ -4,4 +4,4 @@
   become: true
   roles:
     #- mysql-default
-    - awscli-minio
+    - awscli-minio 
