@@ -1,3 +1,4 @@
 ---
 # defaults file for postgresql-timescaledb
 postgresql_version: "12"
+shared_preload_libraries: "timescaledb"

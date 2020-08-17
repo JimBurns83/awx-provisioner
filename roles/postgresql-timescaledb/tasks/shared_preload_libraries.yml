@@ -1,0 +1,6 @@
+- name: provide shared_preload_libraries config
+  template:
+    src: templates/01-shared_preload_libraries.conf.j2
+    dest: "{{postgres_confd_path}}/01-shared_preload_libraries.conf"
+    owner: postgres
+    group: postgres

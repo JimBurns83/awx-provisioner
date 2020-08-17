@@ -12,3 +12,5 @@
 - name: install timescaledb
   package:
     name: timescaledb-postgresql-{{postgresql_version}}
+- include_tasks: shared_preload_libraries.yml
+  notify: postgres_restart

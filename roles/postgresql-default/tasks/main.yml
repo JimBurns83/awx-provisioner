@@ -13,9 +13,11 @@
 - name: provide default config
   template:
     src: templates/00-default.conf.j2
-    dest: "{{postgres_confd_path}}/oo-default.conf"
+    dest: "{{postgres_confd_path}}/00-default.conf"
     owner: postgres
     group: postgres
+- include_tasks: shared_preload_libraries.yml
+
   notify: postgres_restart
 - name: "ensure backup directory exists"
   file:
