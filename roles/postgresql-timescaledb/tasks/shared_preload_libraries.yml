@@ -4,3 +4,8 @@
     dest: "{{postgres_confd_path}}/01-shared_preload_libraries.conf"
     owner: postgres
     group: postgres
+- name: try to collect facts
+  shell: "psql  -P pager=off -t -c \"select concat('{\"',r.name,'\" : \"',r.setting,'\"}') from (select name, setting from pg_settings) as r;\""
+  register: pg_result
+- set_fact: 
+    pg_settings: {{pg_result}}
