@@ -5,7 +5,7 @@
     owner: postgres
     group: postgres
 - name: try to collect facts
-  shell: 'psql -Upostgres -h127.0.0.1 -P pager=off -t -c "select concat(r.name, \" : \", r.setting) from (select name, setting from pg_settings) as r;"'
+  shell: 'psql -Upostgres -h127.0.0.1 -P pager=off -t -c "select concat(r.name, '' : '', r.setting) from (select name, setting from pg_settings) as r;"'
   #shell: 'psql -Upostgres -h127.0.0.1 -P pager=off -t -c "select concat(r.name, r.setting) from (select name, setting from pg_settings) as r;"'
   #shell: "psql -Upostgres -h127.0.0.1 -P pager=off -t -c \"select concat('\"',r.name,'\" : \"',r.setting,'\"') from (select name, setting from pg_settings) as r;\""
   register: pg_result
