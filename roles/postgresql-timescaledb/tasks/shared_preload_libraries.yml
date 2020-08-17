@@ -10,5 +10,5 @@
 - set_fact: 
     pg_settings: "{{pg_result}}"
 - debug:
-  msg: "{{pg_settings}} {{pg_result}}"
+    msg: "{{pg_settings}}"
 - gather_facts: true
