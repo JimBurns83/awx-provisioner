@@ -13,3 +13,5 @@
     pg_settings: "{{pg_result.stdout_lines}}"
 - debug:
     msg: "{{pg_settings}}"
+- name: "Re-run setup to use custom facts"
+  setup: ~
