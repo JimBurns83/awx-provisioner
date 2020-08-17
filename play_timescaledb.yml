@@ -4,4 +4,5 @@
   become: true
   roles:
     - postgresql-default
+    - postgresql-timescaledb
     - awscli-minio
