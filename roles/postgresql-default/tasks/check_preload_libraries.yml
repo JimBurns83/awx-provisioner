@@ -7,4 +7,4 @@
   set_fact: 
     list_libraries: "{{ ansible_local.pg_settings.shared_preload_libraries.split(',') }}"
 - debug:
-    msg: "{{list_libraries | search(shared_preload_libraries)}}"
+    msg: "{{list_libraries.search(shared_preload_libraries)}}"
