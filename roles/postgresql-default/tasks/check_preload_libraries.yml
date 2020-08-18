@@ -1,0 +1,10 @@
+# ansible_local.pg_settings.shared_preload_libraries should be the live version of the setting
+#check this has entries
+#check proposed entry exists
+#if it does exist, leave the entry alone
+#if it does not, then either add or replace the empty entry. 
+- name: Create the list
+  set_fact: 
+    list_libraries: "{{ ansible_local.pg_settings.shared_preload_libraries.split(',') }}"
+- debug:
+  msg: "{{list_libraries}}"
