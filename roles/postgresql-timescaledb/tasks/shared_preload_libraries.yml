@@ -1,3 +1,9 @@
+- name: ensure ohther libraries are preloaded
+  set_fact: 
+    shared_preload_libraries: '"{{shared_preload_libraries}}, {{ansible_local.pg_settings.shared_preload_libraries}}"'
+  when: "shared_preload_libraries NOT IN ansible_local.pg_settings.shared_preload_libraries"
+- debug:
+    msg: "{{shared_preload_libraries}}"
 - name: provide shared_preload_libraries config
   template:
     src: templates/01-shared_preload_libraries.conf.j2
