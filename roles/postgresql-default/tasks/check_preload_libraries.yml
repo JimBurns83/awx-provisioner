@@ -8,3 +8,5 @@
     list_libraries: "{{ ansible_local.pg_settings.shared_preload_libraries.split(',') }}"
 - debug:
     msg: "{{list_libraries is superset(shared_preload_libraries)}}"
+- debug:
+    msg: '{{list_libraries is superset("timescaledb")}}'
