@@ -1,0 +1,3 @@
+---
+# defaults file for openstack-metadata
+fact_path: "/etc/ansible/facts.d/"

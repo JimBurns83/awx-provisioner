@@ -3,6 +3,7 @@
   gather_facts: true #now python is installed
   become: true
   roles:
+    - openstack-metadata
     - postgresql-default
     - postgresql-timescaledb
     - awscli-minio
