@@ -10,7 +10,8 @@
     dest: "{{postgres_confd_path}}/../pg_hba_custom.conf"
     owner: postgres
     group: postgres
-- include_tasks: shared_preload_libraries.yml
+#- include_tasks: shared_preload_libraries.yml
+- include_tasks: check_preload_libraries.yml
 - name: provide default config
   template:
     src: templates/00-default.conf.j2
