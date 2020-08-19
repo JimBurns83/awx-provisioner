@@ -6,7 +6,14 @@
 - name: Create the list
   set_fact: 
     list_libraries: "{{ ansible_local.pg_settings.shared_preload_libraries.split(',') }}"
+    add_libraries: "{{ shared_preload_libraries.split(',') }}"
 - debug:
-    msg: "{{not list_libraries is superset(shared_preload_libraries.split(','))}}"
+    #msg: "{{not list_libraries is superset(shared_preload_libraries.split(','))}}"
+    msg: "{{list_libraries}}"
 - debug:
-    msg: '{{list_libraries is superset("timescaledb")}}'
+    #msg: '{{list_libraries is superset("timescaledb")}}'
+    msg: "{{add_libraries}}"
+- set_fact:
+    merged_list: "{{list_libraries + add_libraries}}"
+- debug:
+    msg: "{{merged_list}}"
