@@ -16,4 +16,4 @@
 - set_fact:
     merged_list: "{{list_libraries + add_libraries}}"
 - debug:
-    msg: "{{merged_list}}"
+    msg: "{{merged_list | unique | join(',')}}"
