@@ -11,6 +11,7 @@
     owner: postgres
     group: postgres
 #- include_tasks: shared_preload_libraries.yml
+- include_tasks: install_fact_script.yml
 - include_tasks: check_preload_libraries.yml
 - name: provide default config
   template:
