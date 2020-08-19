@@ -4,3 +4,5 @@
   service:
     name: postgresql
     state: restarted
+- name: recheck_facts
+  setup: ~
