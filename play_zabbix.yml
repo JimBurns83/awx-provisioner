@@ -1,0 +1,8 @@
+---
+- hosts: zabbix
+  gather_facts: true #now python is installed
+  become: true
+  roles:
+    - zabbix-web-fpm
+    - zabbix-server
+    - awscli-minio 
