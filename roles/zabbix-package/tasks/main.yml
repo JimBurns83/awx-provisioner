@@ -28,6 +28,7 @@
       #use: auto # not required. The required package manager module to use (yum, apt, etc). The default 'auto' will use existing facts or try to autodetect it.,You should only use this field if the automatic selection is not working for some reason.
   with_items:
     - "php{{php_version}}-{{zabbix_backend_db}}"
+    - "php{{php_version}}-fpm"
     - "zabbix-server-{{zabbix_backend_db}}"
     - "zabbix-frontend-php"
     - "zabbix-agent"
