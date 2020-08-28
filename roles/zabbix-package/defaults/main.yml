@@ -7,3 +7,5 @@ php_version: 7.4
 fpm_timezone: "Europe/London"
 fpm_listen: "/run/php/php7.4-fpm.sock"
 #zabbix_backend_db: mysql
+nginx_listen: "listen 80 default_server;"
+#        listen          80;
