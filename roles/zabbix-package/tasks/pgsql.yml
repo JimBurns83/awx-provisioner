@@ -1,6 +1,6 @@
 - name: install ansible package requirement
   package:
-    name: postgresql-client-common
+    name: "postgresql-client-common, postgresql-client"
     state: present
 - name: install ansible python requirement
   pip:
