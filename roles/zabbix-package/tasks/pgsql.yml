@@ -119,7 +119,7 @@
   when: createdb.changed
 - name: provide frontend config
   template:
-    source: "templates/zabbix.conf.php.j2"
+    src: "templates/zabbix.conf.php.j2"
     dest: "/usr/share/zabbix/conf/zabbix.conf.php"
 - name: provide server config| DBHost
   ini_file:
