@@ -34,7 +34,7 @@
     - "zabbix-agent"
 - name: set listen
   ini_file:
-      section: 
+      section: "www"
       path: "/etc/php/{{php_version}}/fpm/pool.d/www.conf" # required. Path to the INI-style file; this file is created if required.,Before 2.3 this option was only usable as I(dest).
       #seuser: undefined # not required. User part of SELinux file context. Will default to system policy, if applicable. If set to C(_default), it will use the C(user) portion of the policy if available.
       #group: undefined # not required. Name of the group that should own the file/directory, as would be fed to I(chown).
@@ -55,7 +55,7 @@
       #setype: undefined # not required. Type part of SELinux file context, C(_default) feature works as for I(seuser).
 - name: set timezone
   ini_file:
-      section: 
+      section: global
       path: "/etc/php/{{php_version}}/fpm/php-fpm.conf" # required. Path to the INI-style file; this file is created if required.,Before 2.3 this option was only usable as I(dest).
       #seuser: undefined # not required. User part of SELinux file context. Will default to system policy, if applicable. If set to C(_default), it will use the C(user) portion of the policy if available.
       #group: undefined # not required. Name of the group that should own the file/directory, as would be fed to I(chown).
