@@ -3,7 +3,7 @@
 zabbix_package_version: 5.0
 zabbix_backend_db: pgsql
 php_version: 7.4
-fpm_listen: 81
+#fpm_listen: 81
 fpm_timezone: "Europe/London"
-#listen = /run/php/php7.4-fpm.sock
+fpm_listen: "/run/php/php7.4-fpm.sock"
 #zabbix_backend_db: mysql

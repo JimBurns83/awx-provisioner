@@ -32,6 +32,7 @@
     - "zabbix-server-{{zabbix_backend_db}}"
     - "zabbix-frontend-php"
     - "zabbix-agent"
+    - "zabbix-nginx-conf"
 - name: set listen
   ini_file:
       section: "www"
