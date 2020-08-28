@@ -1,0 +1,30 @@
+---
+# defaults file for zbx-agent
+zbx_server_ip: 10.32.3.98
+zbx_agent_script_root: /usr/share/zabbix-agent
+zbx_agent_conf_file: /etc/zabbix/zabbix_agentd.conf
+zbx_agent_conf_d: /etc/zabbix/zabbix_agentd.conf.d
+zbx_agent_conf:
+  LogFile: /var/log/zabbix-agent/zabbix_agentd.log
+  LogFileSize: 0
+  LogType: system
+  Server: 10.32.3.98
+  ServerActive: 10.32.3.98
+  Hostname: ""
+  HostnameItem: system.hostname
+  HostMetadata: 
+  RefreshActiveChecks: 120
+  BufferSend: 5
+  BufferSize: 100
+  MaxLinesPerSecond: 20
+  Timeout: 3
+  AllowRoot: 0
+  UnsafeUserParameters: 0
+  Include: /etc/zabbix/zabbix_agentd.conf.d/*.conf
+zbx_user_parameters:
+  custom.vfs:
+    - custom.vfs.discovery,/bin/lsblk -sd -e 1,2,7,11 --json -o KNAME,MOUNTPOINT 
+    #/bin/lsblk -rsd -e 1,2,7,11 -o KNAME,MOUNTPOINT
+    - custom.vfs.dev[*],grep $1 /proc/diskstats | sed 's/  */ /g' |  jq -Rsc 'split(" ")'
+  nginx.stubstatus:
+    - nginx.stubstatus,nginx-status,X=(`curl --silent http://127.0.0.1/nginx_status 2>&1 | grep -Eo "([0-9]+)" `); printf '%s\n' "${X[@]}" | jq -R . | jq -s .

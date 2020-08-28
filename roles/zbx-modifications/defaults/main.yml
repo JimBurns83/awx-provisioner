@@ -1,0 +1,7 @@
+---
+# defaults file for zbx-modifications
+zabbix_api_defaultuser: "admin"
+zabbix_api_defaultpass: "zabbix"
+zabbix_api_user: "admin"
+zabbix_api_pass: "i9b1aF0AtlOmQs6qyvae"
+zabbix_api_url: "https://zabbix.nods.cloud"

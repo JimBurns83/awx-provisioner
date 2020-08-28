@@ -1,0 +1,47 @@
+---
+# defaults file for zbx-server
+zbx_git_repo: "https://github.com/zabbix/zabbix.git"
+zbx_git_branch: "release/4.4"
+zbx_server_shell_group_name: "zabbix"
+zbx_server_shell_user_name: "zbxserver"
+zbx_server_shell_user_pass: zbxpass
+zbx_server_shell_user_groups: "zabbix"
+zbx_db_name: "zbxnice"
+zbx_db_user: "zbxnice"
+zbx_db_password: zbxdbpass
+zbx_db_host: "localhost"
+zbx_db_port: "3306"
+shell_user_home_parent: "/opt"
+shell_default_pass: shelldpass
+zabbix_server_requirements:
+  - openssl
+  #- pkg-config
+  #- mariadb-client
+  - libmysqlclient-dev
+  - libevent-dev
+  - libpcre3-dev
+  - libcurl4
+  - libcurl4-openssl-dev
+  #- libcurl4-dev
+  - build-essential
+  - libxml2-dev
+  - libsnmp-dev
+  - autoconf
+  #- automake
+  #- devscripts 
+  #- debhelper
+  #- quilt 
+  - libmariadb-client-lgpl-dev
+zbx_server_config_file: /usr/local/etc/zabbix_server.conf
+zbx_server_config:
+    LogType: console
+    LogFile: ""
+    DBName: "{{zbx_db_name}}"
+    DBUser: "{{zbx_db_user}}"
+    DBPassword: "{{zbx_db_password}}"
+    DBHost: "{{zbx_db_host}}"
+    DBPort: "{{zbx_db_port}}"
+    LogSlowQueries: 3000
+    User: "{{zbx_server_shell_user_name}}"
+    Include: /usr/local/etc/zabbix_server.conf.d/*.conf
+    StatsAllowedIP: 127.0.0.1

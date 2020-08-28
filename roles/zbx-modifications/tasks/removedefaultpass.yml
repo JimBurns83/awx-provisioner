@@ -1,0 +1,59 @@
+- name: Authenticate with Zabbix API
+  uri:
+    url: "{{zabbix_api_url}}/api_jsonrpc.php"
+    method: POST
+    body: "{ \"jsonrpc\": \"2.0\", \"method\" : \"user.login\", \"params\": { \"user\": {{zabbix_api_defaultuser|tojson}}, \"password\": {{zabbix_api_defaultpass|tojson}}}, \"id\": 1 }"
+    body_format: json
+    return_content: yes
+  register: json_response 
+- name: check for error
+  set_fact: 
+    auth_error: "{{((json_response.content|from_json)['error']['data'])| default('')}}"
+- name: output auth_error variable
+  debug:
+    msg: "{{auth_error}}"
+#- name: output auth variable
+#  debug:
+#    msg: "{{json_response}}"
+- name: "Registering Zabbix API Auth Token"
+  set_fact:
+    ZABAPIAUTH: "{{(json_response.content|from_json)['result']}}"
+  when: auth_error == ""
+- name: get user to test
+  uri:
+    url: "{{zabbix_api_url}}/api_jsonrpc.php"
+    method: POST
+    #body: "{ \"jsonrpc\": \"2.0\", \"method\" : \"user.get\", \"params\": { \"output\":\"extend\" }, \"id\": 1 }"
+    body:
+      jsonrpc: "2.0"
+      method: "user.get"
+      params: 
+        output: "extend"
+      auth: "{{ZABAPIAUTH}}"
+      id: "2"
+    body_format: json
+    return_content: yes
+  register: json_response 
+  when: auth_error == ""
+- name: Set Admin Password
+  uri:
+    url: "{{zabbix_api_url}}/api_jsonrpc.php"
+    method: POST
+    #body: "{ \"jsonrpc\": \"2.0\", \"method\" : \"user.get\", \"params\": { \"output\":\"extend\" }, \"id\": 1 }"
+    body:
+      jsonrpc: "2.0"
+      method: "user.update"
+      params: 
+        userid: "1"
+        passwd: "{{zabbix_api_pass}}"
+      auth: "{{ZABAPIAUTH}}"
+      id: "2"
+    body_format: json
+    return_content: yes
+  register: json_response 
+  when: auth_error == ""
+
+- name: output variable
+  debug:
+    msg: "{{(json_response.content| from_json)['result']}}"
+  when: auth_error == ""

@@ -1,0 +1,167 @@
+- name: ensure GIT is installed
+  apt:
+    pkg: "git"
+    state: present
+- name: Create {{ zbx_server_shell_group_name }} Group 
+  group:
+    name: "{{ zbx_server_shell_group_name }}"
+    state: present
+- name: "collect password"
+  set_fact:
+    zbx_server_shell_user_pass: "{{ zbx_server_shell_user_pass | default(shell_default_pass)}}"
+- name: Create "{{zbx_server_shell_user_name}} User"
+  become: yes
+  user:
+      name: "{{zbx_server_shell_user_name}}" # required. Name of the user to create, remove or modify.
+      comment: ansible-generated on {{ansible_date_time.iso8601_basic_short}} # not required. Optionally sets the description (aka I(GECOS)) of user account.
+      update_password: on_create # on_create # not required. choices: always;on_create. C(always) will update passwords if they differ.  C(on_create) will only set the password for newly created users.
+      create_home: yes # not required. Unless set to C(no), a home directory will be made for the user when the account is created or if the home directory does not exist.,Changed from C(createhome) to C(create_home) in version 2.5.
+      groups: "{{zbx_server_shell_user_groups | default(zbx_server_shell_user_name)}}" # not required. List of groups user will be added to. When set to an empty string C(''), C(null), or C(~), the user is removed from all groups except the primary group. (C(~) means C(null) in YAML),Before version 2.3, the only input format allowed was a comma separated string. Now this parameter accepts a list as well as a comma separated string.
+      append: yes # not required. If C(yes), add the user to the groups specified in C(groups).,If C(no), user will only be added to the groups specified in C(groups), removing them from all other groups.
+      home: "{{shell_user_home_parent | default('/opt')}}/{{zbx_server_shell_user_name}}" # not required. Optionally set the user's home directory.
+      password:  "{{zbx_server_shell_user_pass | password_hash('sha512') }}" # not required. Optionally set the user's password to this crypted value.,On macOS systems, this value has to be cleartext. Beware of security issues.,See U(https://docs.ansible.com/ansible/faq.html#how-do-i-generate-crypted-passwords-for-the-user-module) for details on various ways to generate these password values.
+      generate_ssh_key: yes # not required. Whether to generate a SSH key for the user in question. This will B(not) overwrite an existing SSH key.
+      ssh_key_comment: ansible-generated on {{ansible_date_time.iso8601_basic_short}}  # not required. Optionally define the comment for the SSH key.
+      group: "{{zbx_server_shell_group_name | default(zbx_server_shell_user_name)}}" # not required. Optionally sets the user's primary group (takes a group name).
+      system: no # not required. When creating an account C(state=present), setting this to C(yes) makes the user a system account. This setting cannot be changed on existing users.
+      state: present # not required. choices: absent;present. Whether the account should exist or not, taking action if the state is different from what is stated.
+      shell: "/bin/bash"
+- name: "get ~{{zbx_server_shell_user_name}}"
+  stat:
+    path: "~{{zbx_server_shell_user_name}}"
+  tags:
+    - "test"
+  register: zabbix_home
+- name: get environmment path
+  set_fact:
+    environment_path: "{{zabbix_home.stat.path}}"
+  tags:
+    - "test"
+
+- name: Check out Source
+  git:
+      dest: "~{{zbx_server_shell_user_name}}/src/" # required. The path of where the repository should be checked out. This parameter is required, unless C(clone) is set to C(no).
+      repo: "{{zbx_git_repo}}" # required. git, SSH, or HTTP(S) protocol address of the git repository.
+      force: yes # not required. If C(yes), any modified files in the working repository will be discarded.  Prior to 0.7, this was always 'yes' and could not be disabled.  Prior to 1.9, the default was `yes`
+      track_submodules: no # not required. if C(yes), submodules will track the latest commit on their master branch (or other branch specified in .gitmodules).  If C(no), submodules will be kept at the revision specified by the main project. This is equivalent to specifying the --remote flag to git submodule update.
+      #reference: undefined # not required. Reference repository (see "git clone --reference ...")
+      #accept_hostkey: no # not required. if C(yes), ensure that "-o StrictHostKeyChecking=no" is present as an ssh option.
+      clone: yes # not required. If C(no), do not clone the repository if it does not exist locally
+      update: yes # not required. If C(no), do not retrieve new revisions from the origin repository,Operations like archive will work on the existing (old) repository and might not respond to changes to the options version or remote.
+      #ssh_opts: undefined # not required. Creates a wrapper script and exports the path as GIT_SSH which git then automatically uses to override ssh arguments. An example value could be "-o StrictHostKeyChecking=no"
+      #bare: no # not required. if C(yes), repository will be created as a bare repo, otherwise it will be a standard repo with a workspace.
+      #verify_commit: no # not required. if C(yes), when cloning or checking out a C(version) verify the signature of a GPG signed commit. This requires C(git) version>=2.1.0 to be installed. The commit MUST be signed and the public key MUST be present in the GPG keyring.
+      #archive: undefined # not required. Specify archive file path with extension. If specified, creates an archive file of the specified format containing the tree structure for the source tree. Allowed archive formats ["zip", "tar.gz", "tar", "tgz"],This will clone and perform git archive from local directory as not all git servers support git archive.
+      #recursive: yes # not required. if C(no), repository will be cloned without the --recursive option, skipping sub-modules.
+      #executable: undefined # not required. Path to git executable to use. If not supplied, the normal mechanism for resolving binary paths will be used.
+      #remote: origin # not required. Name of the remote.
+      #refspec: undefined # not required. Add an additional refspec to be fetched. If version is set to a I(SHA-1) not reachable from any branch or tag, this option may be necessary to specify the ref containing the I(SHA-1). Uses the same syntax as the 'git fetch' command. An example value could be "refs/meta/config".
+      #separate_git_dir: undefined # not required. The path to place the cloned repository. If specified, Git repository can be separated from working tree.
+      #umask: undefined # not required. The umask to set before doing any checkouts, or any other repository maintenance.
+      #depth: undefined # not required. Create a shallow clone with a history truncated to the specified number or revisions. The minimum possible value is C(1), otherwise ignored. Needs I(git>=1.9.1) to work correctly.
+      version: "{{zbx_git_branch}}" # not required. What version of the repository to check out.  This can be the literal string C(HEAD), a branch name, a tag name. It can also be a I(SHA-1) hash, in which case C(refspec) needs to be specified if the given revision is not already available.
+      #key_file: undefined # not required. Specify an optional private key file path, on the target host, to use for the checkout.
+- name: Change Owner of "~{{zbx_server_shell_user_name}}/src/" 
+  file:
+    path: "~{{zbx_server_shell_user_name}}/src/" 
+    owner: "{{zbx_server_shell_user_name}}"
+    group: "{{zbx_server_shell_group_name | default(zbx_server_shell_user_name)}}"
+    recurse: yes
+- name: install build requirments
+  apt:
+    pkg: "{{zabbix_server_requirements}}"
+    state: present
+- name: check missing exists
+  stat:
+      path: "~{{zbx_server_shell_user_name}}/src/missing" # required. The full path of the file/object to get the facts of.
+      get_checksum: no # not required. Whether to return a checksum of the file (default sha1).
+      follow: yes # not required. Whether to follow symlinks.
+      checksum_algorithm: md5 # not required. choices: md5;sha1;sha224;sha256;sha384;sha512. Algorithm to determine checksum of file. Will throw an error if the host is unable to use specified algorithm.,The remote host has to support the hashing method specified, C(md5) can be unavailable if the host is FIPS-140 compliant.
+      get_mime: no # not required. Use file magic and return data about the nature of the file. this uses the 'file' utility found on most Linux/Unix systems.,This will add both `mime_type` and 'charset' fields to the return, if possible.,In 2.3 this option changed from 'mime' to 'get_mime' and the default changed to 'Yes'.
+      get_md5: no # not required. Whether to return the md5 sum of the file.,Will return None if not a regular file or if we're unable to use md5 (Common for FIPS-140 compliant systems).,The default of this option changed from C(yes) to C(no) in Ansible 2.5 and will be removed altogether in Ansible 2.9.,Use C(get_checksum=true) with C(checksum_algorithm=md5) to return an md5 hash under the C(checksum) return value.
+      get_attributes: yes # not required. Get file attributes using lsattr tool if present.
+  register: missing_stat
+- name: check out missing files
+  git:
+    repo: "https://github.com/JimBurnsNice/zabbix-configure.git"
+    dest: "~{{zbx_server_shell_user_name}}/src-missing/" # required. The path of where the repository should be checked out. This parameter is required, unless C(clone) is set to C(no).
+    update: yes
+    force: yes
+  ignore_errors: yes
+- name: resolve gitignore
+  include_tasks: resolve_gitignore.yml
+  when: missing_stat.stat.exists == false
+#- name: ensure configure is executable
+#  file: 
+#    dest: "~{{zbx_server_shell_user_name}}/src/configure"
+#    mode: a+x
+#- name: Running ./configure for zabbix source
+#  command: ./configure --enable-server --enable-agent --with-mysql --enable-ipv6 --with-net-snmp --with-libcurl --with-libxml2 --with-openssl chdir=~{{zbx_server_shell_user_name}}/src/
+
+- name: automake zabbix
+  command: automake
+  args:
+    chdir: "~{{zbx_server_shell_user_name}}/src"
+    creates: "~{{zbx_server_shell_user_name}}/src/tests/Makefile.in"
+  ignore_errors: yes
+- name: autoreconf zabbix
+  command: autoreconf 
+  args:
+    chdir: "~{{zbx_server_shell_user_name}}/src"
+    creates: "~{{zbx_server_shell_user_name}}/src/configure"
+- name: automake zabbix
+  command: automake
+  args:
+    chdir: "~{{zbx_server_shell_user_name}}/src"
+    creates: "~{{zbx_server_shell_user_name}}/src/tests/Makefile.in"
+  ignore_errors: yes
+- name: ensure configure is executable
+  file: 
+    dest: "~{{zbx_server_shell_user_name}}/src/configure"
+    mode: a+x
+- name: Running ./configure for zabbix source again
+  command: ./configure --enable-server --enable-agent --with-mysql --enable-ipv6 --with-net-snmp --with-libcurl --with-libxml2 --with-openssl chdir=~{{zbx_server_shell_user_name}}/src/
+- name: Running "make install" for zabbix
+  command: 'make install chdir=~{{zbx_server_shell_user_name}}/src/'
+- name: "Set Options"
+  set_fact:
+    options: "{{zbx_server_config | dict2items  }}" #| dictsort | dict2items
+  when: zbx_server_config | default(None) != None
+- name: "provide {{zbx_server_config_file}}"
+  ini_file:
+        no_extra_spaces: yes
+        section: null # required. Section name in INI file. This is added if C(state=present) automatically when a single value is being set.,If left empty or set to `null`, the I(option) will be placed before the first I(section). Using `null` is also required if the config format does not support sections.
+        path: "{{zbx_server_config_file}}" # required. Path to the INI-style file; this file is created if required.,Before 2.3 this option was only usable as I(dest).
+        owner: "{{zbx_server_shell_user_name}}"
+        group: "{{zbx_server_shell_group_name | default(zbx_server_shell_user_name)}}"
+        option: "{{optionvar.key}}" # not required. If set (required for changing a I(value)), this is the name of the option.,May be omitted if adding/removing a whole I(section).
+        value: "{{optionvar.value}}" # not required. The string value to be associated with an I(option). May be omitted when removing an I(option).
+        state: present # not required. choices: absent;present. If set to C(absent) the option or section will be removed if present instead of created.
+        mode: 0644 # not required. Mode the file or directory should be. For those used to I(/usr/bin/chmod) remember that modes are actually octal numbers. You must either add a leading zero so that Ansible's YAML parser knows it is an octal number (like C(0644) or C(01777)) or quote it (like C('644') or C('1777')) so Ansible receives a string and can do its own conversion from string into number.  Giving Ansible a number without following one of these rules will end up with a decimal number which will have unexpected results. As of version 1.8, the mode may be specified as a symbolic mode (for example, C(u+rwx) or C(u=rw,g=r,o=r)).
+        #backup: yes # not required. Create a backup file including the timestamp information so you can get the original file back if you somehow clobbered it incorrectly.
+        create: yes # not required. If set to 'no', the module will fail if the file does not already exist. By default it will create the file if it is missing.
+  loop: "{{ options }}"
+  loop_control:
+    loop_var: optionvar
+#- name: create CONFIG
+#  template:
+#    src: templates/zabbix_server.conf.j2
+#    dest: /usr/local/etc/zabbix_server.conf
+- name: create service
+  template:
+    src: templates/zabbix-server.service.j2
+    dest: /lib/systemd/system/zabbix-server.service
+- name: ensure logfile exists
+  copy:
+    content: ""
+    dest: /var/log/zabbix_server.log
+    force: no
+    group: adm
+    owner: "{{zbx_server_shell_user_name}}"
+    mode: 0664
+#TODO:logrotate
+- name: restart service
+  service:
+    name: zabbix-server
+    state: restarted
+    enabled: yes

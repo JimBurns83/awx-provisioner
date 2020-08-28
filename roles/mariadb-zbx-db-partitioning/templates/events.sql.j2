@@ -1,0 +1,2 @@
+DROP EVENT IF EXISTS `E_Part_Manage`;
+CREATE EVENT `E_Part_Manage` ON SCHEDULE EVERY 1 DAY STARTS '2018-09-01 00:00:00' ON COMPLETION NOT PRESERVE ENABLE DO call partition_maintenance_all("{{ zbx_db_name }}")

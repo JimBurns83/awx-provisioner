@@ -1,0 +1,51 @@
+- name: "{{missing_file}}"
+  set_fact: 
+    file_path: "{{missing_file.path}}"
+  tags:
+    - "test"
+- name: "get source path"
+  set_fact:
+    source_path: "{{environment_path}}/src-missing/"
+- name: "get childpath"
+  set_fact:
+    child_path: '{{file_path.replace(source_path,"")}}'
+  tags:
+    - "test"
+- name: Output fact
+  debug:
+    msg: "{{child_path}} {{child_path | length}}"
+- name: get file name
+  set_fact:
+    file_name: '{{child_path.split("/")[-1]}}'
+- name: Output fact
+  debug:
+    msg: "{{file_name }} {{file_name | length}}"
+
+- name: reset relative path
+  set_fact:
+    relative_path: ''
+- name: get relative path
+  set_fact:
+    relative_path: '{{child_path.replace(file_name, "")}}'
+  when: (file_name | length) < (child_path | length)
+- name: Output relative
+  debug:
+    msg: "{{relative_path}}"
+- name: check dest exists
+  stat:
+      path: ~{{zbx_server_shell_user_name}}/src/{{relative_path}}{{file_name}} # required. The full path of the file/object to get the facts of.
+      get_checksum: no # not required. Whether to return a checksum of the file (default sha1).
+      follow: no # not required. Whether to follow symlinks.
+      checksum_algorithm: md5 # not required. choices: md5;sha1;sha224;sha256;sha384;sha512. Algorithm to determine checksum of file. Will throw an error if the host is unable to use specified algorithm.,The remote host has to support the hashing method specified, C(md5) can be unavailable if the host is FIPS-140 compliant.
+      get_mime: no # not required. Use file magic and return data about the nature of the file. this uses the 'file' utility found on most Linux/Unix systems.,This will add both `mime_type` and 'charset' fields to the return, if possible.,In 2.3 this option changed from 'mime' to 'get_mime' and the default changed to 'Yes'.
+      get_md5: no # not required. Whether to return the md5 sum of the file.,Will return None if not a regular file or if we're unable to use md5 (Common for FIPS-140 compliant systems).,The default of this option changed from C(yes) to C(no) in Ansible 2.5 and will be removed altogether in Ansible 2.9.,Use C(get_checksum=true) with C(checksum_algorithm=md5) to return an md5 hash under the C(checksum) return value.
+      get_attributes: yes # not required. Get file attributes using lsattr tool if present.
+  register: filecheck
+- name: Link {{file_name}} 
+  file:
+    src: "{{file_path}}"
+    dest: "~{{zbx_server_shell_user_name}}/src/{{relative_path}}{{file_name}}"
+    state: link
+  ignore_errors: yes
+  when: filecheck.stat.exists == false
+    

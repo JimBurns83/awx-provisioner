@@ -1,0 +1,17 @@
+- name: prepare sparse git repository
+  shell: |
+    git init
+    git config core.sparsecheckout true
+    git remote add origin {{ zbx_git_repo }}
+  args:
+    chdir: "{{ zbx_base_dir }}"
+    creates: "{{ zbx_base_dir }}/.git"
+- name: configure sparse-checkout
+  copy:
+    dest: "{{ zbx_base_dir }}/.git/info/sparse-checkout"
+    content: '{{ zbx_git_frontend | join("\n") }}'
+- name: clone code
+  shell: git pull origin {{zbx_git_branch}}
+  args:
+    chdir: "{{ zbx_base_dir }}"
+    creates: "{{ base_dir }}/{{ zbx_git_frontend | first }}"

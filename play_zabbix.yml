@@ -5,4 +5,5 @@
   roles:
     - zabbix-web-fpm
     - zabbix-server
-    - awscli-minio 
+    - zabbix-agent
+    #- awscli-minio 

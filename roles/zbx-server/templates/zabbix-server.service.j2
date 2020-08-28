@@ -1,0 +1,16 @@
+[Unit]
+Description=Zabbix Server with MySQL DB
+After=syslog.target network.target mysqld.service
+
+[Service]
+Type=simple
+User={{ zbx_server_shell_user_name }}
+PidFile=/tmp/zabbix_server.pid
+SyslogIdentifier=zabbix_server
+ExecStart=/usr/local/sbin/zabbix_server --foreground
+#-c /usr/local/etc/zabbix_server.conf
+ExecReload=/usr/local/sbin/zabbix_server -R config_cache_reload
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

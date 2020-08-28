@@ -1,0 +1,104 @@
+---
+- name: install jq
+  apt:
+    pkg: jq
+    state: present
+- name: add key
+#  apt_key:
+  apt_key:
+      keyserver: "keyserver.ubuntu.com" # not required. The keyserver to retrieve key from.
+      #url: undefined # not required. The URL to retrieve key from.
+      #data: undefined # not required. The keyfile contents to add to the keyring.
+      #keyring: undefined # not required. The full path to specific keyring file in /etc/apt/trusted.gpg.d/
+      state: present # not required. choices: absent;present. Ensures that the key is present (added) or absent (revoked).
+      #file: undefined # not required. The path to a keyfile on the remote server to add to the keyring.
+      validate_certs: yes # not required. If C(no), SSL certificates for the target url will not be validated. This should only be used on personally controlled sites using self-signed certificates.
+      id: "082AB56BA14FE591" # not required. The identifier of the key.,Including this allows check mode to correctly report the changed state.,If specifying a subkey's id be aware that apt-key does not understand how to remove keys via a subkey id.  Specify the primary key's id instead.,This parameter is required when C(state) is set to C(absent).
+#    url: "https://repo.zabbix.com/zabbix/4.4/ubuntu/dists/{{ansible_distribution_release}}/Release.gpg"
+#    state: "present"
+- name: add repository
+  apt_repository:
+      repo: "deb https://repo.zabbix.com/zabbix/4.4/ubuntu/ {{ansible_distribution_release}} main" # required. A source string for the repository.
+      state: present # not required. choices: absent;present. A source string state.
+      update_cache: yes # not required. Run the equivalent of C(apt-get update) when a change occurs.  Cache updates are run after making changes.
+      #mode: 0644 # not required. The octal mode for newly created files in sources.list.d
+      #codename: undefined # not required. Override the distribution codename to use for PPA repositories. Should usually only be set when working with a PPA on a non-Ubuntu target (e.g. Debian or Mint)
+      #validate_certs: yes # not required. If C(no), SSL certificates for the target repo will not be validated. This should only be used on personally controlled sites using self-signed certificates.
+      #filename: undefined # not required. Sets the name of the source list file in sources.list.d. Defaults to a file name based on the repository source url. The .list extension will be automatically added.
+- name: Update Apt
+  apt:
+    update_cache: true
+    #autoremove: no # not required. If C(yes), remove unused dependency packages for all module states except I(build-dep). It can also be used as the only option.,Previous to version 2.4, autoclean was also an alias for autoremove, now it is its own separate command. See documentation for further information.
+    force: yes # not required. Corresponds to the C(--force-yes) to I(apt-get) and implies C(allow_unauthenticated: yes),This option will disable checking both the packages' signatures and the certificates of the web servers they are downloaded from.,This option *is not* the equivalent of passing the C(-f) flag to I(apt-get) on the command line,**This is a destructive operation with the potential to destroy your system, and it should almost never be used.** Please also see C(man apt-get) for more information.
+    force_apt_get: yes # not required. Force usage of apt-get instead of aptitude
+    #update_cache: no # not required. Run the equivalent of C(apt-get update) before the operation. Can be run as part of the package installation or as a separate step.
+    #only_upgrade: no # not required. Only upgrade a package if it is already installed.
+    #deb: undefined # not required. Path to a .deb package on the remote machine.,If :// in the path, ansible will attempt to download deb before installing. (Version added 2.1)
+    #cache_valid_time: 0 # not required. Update the apt cache if its older than the I(cache_valid_time). This option is set in seconds. As of Ansible 2.4, this sets I(update_cache=yes).
+    dpkg_options: force-confdef,force-confold # not required. Add dpkg options to apt command. Defaults to '-o "Dpkg::Options::=--force-confdef" -o "Dpkg::Options::=--force-confold"',Options should be supplied as comma separated list
+    #upgrade: dist # not required. choices: dist;full;no;safe;yes. If yes or safe, performs an aptitude safe-upgrade.,If full, performs an aptitude full-upgrade.,If dist, performs an apt-get dist-upgrade.,Note: This does not upgrade a specific package, use state=latest for that.,Note: Since 2.4, apt-get is used as a fall-back if aptitude is not present.
+  #ignore_errors: true
+- name: install zabbix agent
+  apt:
+    pkg: zabbix-agent
+    #update_cache: true
+    state: latest
+- name: "Set Options"
+  set_fact:
+    options: "{{zbx_agent_conf | dict2items  }}" #| dictsort | dict2items
+- name: Update Configuration
+  ini_file:
+      section: null # required. Section name in INI file. This is added if C(state=present) automatically when a single value is being set.,If left empty or set to `null`, the I(option) will be placed before the first I(section). Using `null` is also required if the config format does not support sections.
+      path: "{{zbx_agent_conf_file}}" # required. Path to the INI-style file; this file is created if required.,Before 2.3 this option was only usable as I(dest).
+      no_extra_spaces: yes # not required. Do not insert spaces before and after '=' symbol
+      option: "{{optionvar.key}}" # not required. If set (required for changing a I(value)), this is the name of the option.,May be omitted if adding/removing a whole I(section).
+      value: "{{optionvar.value}}" # not required. The string value to be associated with an I(option). May be omitted when removing an I(option).
+      allow_no_value: false # not required. allow option without value and without '=' symbol
+      state: present # not required. choices: absent;present. If set to C(absent) the option or section will be removed if present instead of created.
+      #backup: no # not required. Create a backup file including the timestamp information so you can get the original file back if you somehow clobbered it incorrectly.
+      #create: yes # not required. If set to 'no', the module will fail if the file does not already exist. By default it will create the file if it is missing.
+  loop: "{{ options }}"
+  loop_control:
+    loop_var: optionvar
+- name: "set hostname to {{ec2_tag_Name}}"
+  ini_file:
+      section: null # required. Section name in INI file. This is added if C(state=present) automatically when a single value is being set.,If left empty or set to `null`, the I(option) will be placed before the first I(section). Using `null` is also required if the config format does not support sections.
+      path: "{{zbx_agent_conf_file}}" # required. Path to the INI-style file; this file is created if required.,Before 2.3 this option was only usable as I(dest).
+      no_extra_spaces: yes # not required. Do not insert spaces before and after '=' symbol
+      option: "Hostname" # not required. If set (required for changing a I(value)), this is the name of the option.,May be omitted if adding/removing a whole I(section).
+      value: "{{ec2_tag_Name}}" # not required. The string value to be associated with an I(option). May be omitted when removing an I(option).
+      allow_no_value: false # not required. allow option without value and without '=' symbol
+      state: present # not required. choices: absent;present. If set to C(absent) the option or section will be removed if present instead of created.
+  register: HNFound
+- name: "remove hostnameitem if {{ec2_tag_Name}} is set"
+  ini_file:
+      section: null # required. Section name in INI file. This is added if C(state=present) automatically when a single value is being set.,If left empty or set to `null`, the I(option) will be placed before the first I(section). Using `null` is also required if the config format does not support sections.
+      path: "{{zbx_agent_conf_file}}" # required. Path to the INI-style file; this file is created if required.,Before 2.3 this option was only usable as I(dest).
+      no_extra_spaces: yes # not required. Do not insert spaces before and after '=' symbol
+      option: "HostnameItem" # not required. If set (required for changing a I(value)), this is the name of the option.,May be omitted if adding/removing a whole I(section).
+      allow_no_value: false # not required. allow option without value and without '=' symbol
+      state: absent # not required. choices: absent;present. If set to C(absent) the option or section will be removed if present instead of created.
+  when: HNFound.changed
+- include_tasks: userparams.yml
+  with_items: "{{ zbx_user_parameters }}"
+  loop_control:
+    loop_var: zbx_user_parameter
+
+#- name: Update Configuration
+#  ini_file:
+#      section: null # required. Section name in INI file. This is added if C(state=present) automatically when a single value is being set.,If left empty or set to `null`, the I(option) will be placed before the first I(section). Using `null` is also required if the config format does not support sections.
+#      path: "{{zbx_agent_conf_file}}" # required. Path to the INI-style file; this file is created if required.,Before 2.3 this option was only usable as I(dest).
+#      no_extra_spaces: yes # not required. Do not insert spaces before and after '=' symbol
+#      option: "Hostname" # not required. If set (required for changing a I(value)), this is the name of the option.,May be omitted if adding/removing a whole I(section).
+#      allow_no_value: false # not required. allow option without value and without '=' symbol
+#      state: absent # not required. choices: absent;present. If set to C(absent) the option or section will be removed if present instead of created.
+#      #backup: no # not required. Create a backup file including the timestamp information so you can get the original file back if you somehow clobbered it incorrectly.
+#      #create: yes # not required. If set to 'no', the module will fail if the file does not already exist. By default it will create the file if it is missing.
+#  when: zbx_agent_conf.Hostname | default("") == ""
+#TODO:user parameters
+#TODO:logrotate
+- name: restart agent
+  service: 
+    name: zabbix-agent
+    state: restarted
+    enabled: yes

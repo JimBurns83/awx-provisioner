@@ -1,0 +1,62 @@
+---
+- name: copy Partitioning Routines to server
+  template:
+    dest: /tmp/routines.sql
+    src: templates/routines.sql.j2
+  register: routines
+  tags:
+    - Install
+    - ConfUpdate
+
+- name: Import Partitioning Routines
+  mysql_db:
+    state: import
+    login_port: 3306 # not required. Port of the MySQL server. Requires I(login_host) be defined as other then localhost if login_port is used.
+    login_user: "{{zbx_db_user}}" # not required. The username used to authenticate with.
+    login_host: "{{zbx_db_host}}" # not required. Host running the database.
+    login_password: "{{zbx_db_password}}" # not required. The password used to authenticate with.
+    name: "{{ zbx_db_name }}"
+    target: /tmp/routines.sql
+  when: routines.changed
+  tags:
+   - Install
+   - ConfUpdate
+
+- name: copy Partitioning events to server
+  template:
+    dest: /tmp/events.sql
+    src: templates/events.sql.j2
+  register: events
+  tags:
+   - Install
+- name: Import events Routines
+  mysql_db:
+    state: import
+    login_port: 3306 # not required. Port of the MySQL server. Requires I(login_host) be defined as other then localhost if login_port is used.
+    login_user: "{{zbx_db_user}}" # not required. The username used to authenticate with.
+    login_host: "{{zbx_db_host}}" # not required. Host running the database.
+    login_password: "{{zbx_db_password}}" # not required. The password used to authenticate with.
+    name: "{{ zbx_db_name }}"
+    target: /tmp/events.sql
+  when: events.changed
+  tags:
+   - Install
+   - ConfUpdate
+#replace with ini value from defaults
+#rds support required https://stackoverflow.com/questions/14940910/creating-mysql-events-in-amazon-rds 
+#- name: copy enable conf
+#  copy:
+#    src: files/mariadb-event_schedule.cnf
+#    dest: /etc/mysql/mariadb.conf.d/00-mariadb-event_schedule.cnf
+#  register: enableschedule
+#  tags:
+#   - Install
+#   - ConfUpdate
+#- name: Restart Mysql
+#  service: 
+#    name: mysql
+#    state: restarted
+#  when: enableschedule.changed
+#  tags:
+#   - Install
+#   - ConfUpdate

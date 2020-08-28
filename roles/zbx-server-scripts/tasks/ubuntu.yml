@@ -1,0 +1,94 @@
+---
+- name: install pip3 requirements
+  pip:
+      #virtualenv: undefined # not required. An optional path to a I(virtualenv) directory to install into. It cannot be specified together with the 'executable' parameter (added in 2.1). If the virtualenv does not exist, it will be created before installing packages. The optional virtualenv_site_packages, virtualenv_command, and virtualenv_python options affect the creation of the virtualenv.
+      #virtualenv_site_packages: no # not required. Whether the virtual environment will inherit packages from the global site-packages directory.  Note that if this setting is changed on an already existing virtual environment it will not have any effect, the environment must be deleted and newly created.
+      #virtualenv_command: virtualenv # not required. The command or a pathname to the command to create the virtual environment with. For example C(pyvenv), C(virtualenv), C(virtualenv2), C(~/bin/virtualenv), C(/usr/local/bin/virtualenv).
+      #chdir: undefined # not required. cd into this directory before running the command
+      #requirements: undefined # not required. The path to a pip requirements file, which should be local to the remote system. File can be specified as a relative path if using the chdir option.
+      name: "{{zbx_server_scripts_pip_requirements}}" # not required. The name of a Python library to install or the url(bzr+,hg+,git+,svn+) of the remote package.,This can be a list (since 2.2) and contain version specifiers (since 2.7).
+      #virtualenv_python: undefined # not required. The Python executable used for creating the virtual environment. For example C(python3.5), C(python2.7). When not specified, the Python version used to run the ansible module is used. This parameter should not be used when C(virtualenv_command) is using C(pyvenv) or the C(-m venv) module.
+      #editable: no # not required. Pass the editable flag.
+      #umask: undefined # not required. The system umask to apply before installing the pip package. This is useful, for example, when installing on systems that have a very restrictive umask by default (e.g., 0077) and you want to pip install packages which are to be used by all users. Note that this requires you to specify desired umask mode in octal, with a leading 0 (e.g., 0077).
+      executable: pip3 # not required. The explicit executable or a pathname to the executable to be used to run pip for a specific version of Python installed in the system. For example C(pip-3.3), if there are both Python 2.7 and 3.3 installations in the system and you want to run pip for the Python 3.3 installation. It cannot be specified together with the 'virtualenv' parameter (added in 2.1). By default, it will take the appropriate version for the python interpreter use by ansible, e.g. pip3 on python 3, and pip2 or pip on python 2.
+      #extra_args: undefined # not required. Extra arguments passed to pip.
+      state: present # not required. choices: absent;forcereinstall;latest;present. The state of module,The 'forcereinstall' option is only available in Ansible 2.1 and above.
+      #version: undefined # not required. The version number to install of the Python library specified in the I(name) parameter.
+- name: "ensure .aws folder exists"
+  file:
+    path: "~{{zbx_server_shell_user_name}}/.aws"
+    state: "directory"
+- name: create AWS default config
+  ini_file:
+      section: "default" # required. Section name in INI file. This is added if C(state=present) automatically when a single value is being set.,If left empty or set to `null`, the I(option) will be placed before the first I(section). Using `null` is also required if the config format does not support sections.
+      path: "~{{zbx_server_shell_user_name}}/.aws/confg" # required. Path to the INI-style file; this file is created if required.,Before 2.3 this option was only usable as I(dest).
+      #seuser: undefined # not required. User part of SELinux file context. Will default to system policy, if applicable. If set to C(_default), it will use the C(user) portion of the policy if available.
+      group: "{{zbx_server_shell_group_name}}" # not required. Name of the group that should own the file/directory, as would be fed to I(chown).
+      option: "{{item.key}}" # not required. If set (required for changing a I(value)), this is the name of the option.,May be omitted if adding/removing a whole I(section).
+      #unsafe_writes: no # not required. By default this module uses atomic operations to prevent data corruption or inconsistent reads from the target files, but sometimes systems are configured or just broken in ways that prevent this. One example is docker mounted files, which cannot be updated atomically from inside the container and can only be written in an unsafe manner.,This option allows Ansible to fall back to unsafe methods of updating files when atomic operations fail (however, it doesn't force Ansible to perform unsafe writes). IMPORTANT! Unsafe writes are subject to race conditions and can lead to data corruption.
+      #selevel: s0 # not required. Level part of the SELinux file context. This is the MLS/MCS attribute, sometimes known as the C(range). C(_default) feature works as for I(seuser).
+      no_extra_spaces: yes # not required. Do not insert spaces before and after '=' symbol
+      #serole: undefined # not required. Role part of SELinux file context, C(_default) feature works as for I(seuser).
+      value: "{{item.value}}" # not required. The string value to be associated with an I(option). May be omitted when removing an I(option).
+      #allow_no_value: false # not required. allow option without value and without '=' symbol
+      state: present # not required. choices: absent;present. If set to C(absent) the option or section will be removed if present instead of created.
+      #mode: undefined # not required. Mode the file or directory should be. For those used to I(/usr/bin/chmod) remember that modes are actually octal numbers. You must either add a leading zero so that Ansible's YAML parser knows it is an octal number (like C(0644) or C(01777)) or quote it (like C('644') or C('1777')) so Ansible receives a string and can do its own conversion from string into number.  Giving Ansible a number without following one of these rules will end up with a decimal number which will have unexpected results. As of version 1.8, the mode may be specified as a symbolic mode (for example, C(u+rwx) or C(u=rw,g=r,o=r)).
+      #others: undefined # not required. All arguments accepted by the M(file) module also work here
+      owner: "{{zbx_server_shell_user_name}}" # not required. Name of the user that should own the file/directory, as would be fed to I(chown).
+      #attributes: undefined # not required. Attributes the file or directory should have. To get supported flags look at the man page for I(chattr) on the target system. This string should contain the attributes in the same order as the one displayed by I(lsattr).,C(=) operator is assumed as default, otherwise C(+) or C(-) operators need to be included in the string.
+      #backup: no # not required. Create a backup file including the timestamp information so you can get the original file back if you somehow clobbered it incorrectly.
+      #create: yes # not required. If set to 'no', the module will fail if the file does not already exist. By default it will create the file if it is missing.
+      #setype: undefined # not required. Type part of SELinux file context, C(_default) feature works as for I(seuser).
+  with_items:
+    - { key: 'region', value: '{{aws_region}}'}
+    - { key: 'output', value: 'json'}
+    #- "region": "{{aws_region}}"
+    #- "output": "json"
+- name: create AWS Default config
+  ini_file:
+      section: "default" # required. Section name in INI file. This is added if C(state=present) automatically when a single value is being set.,If left empty or set to `null`, the I(option) will be placed before the first I(section). Using `null` is also required if the config format does not support sections.
+      path: "~{{zbx_server_shell_user_name}}/.aws/credentials" # required. Path to the INI-style file; this file is created if required.,Before 2.3 this option was only usable as I(dest).
+      #seuser: undefined # not required. User part of SELinux file context. Will default to system policy, if applicable. If set to C(_default), it will use the C(user) portion of the policy if available.
+      group: "{{zbx_server_shell_group_name}}" # not required. Name of the group that should own the file/directory, as would be fed to I(chown).
+      option: "{{item.key}}" # not required. If set (required for changing a I(value)), this is the name of the option.,May be omitted if adding/removing a whole I(section).
+      #unsafe_writes: no # not required. By default this module uses atomic operations to prevent data corruption or inconsistent reads from the target files, but sometimes systems are configured or just broken in ways that prevent this. One example is docker mounted files, which cannot be updated atomically from inside the container and can only be written in an unsafe manner.,This option allows Ansible to fall back to unsafe methods of updating files when atomic operations fail (however, it doesn't force Ansible to perform unsafe writes). IMPORTANT! Unsafe writes are subject to race conditions and can lead to data corruption.
+      #selevel: s0 # not required. Level part of the SELinux file context. This is the MLS/MCS attribute, sometimes known as the C(range). C(_default) feature works as for I(seuser).
+      no_extra_spaces: yes # not required. Do not insert spaces before and after '=' symbol
+      #serole: undefined # not required. Role part of SELinux file context, C(_default) feature works as for I(seuser).
+      value: "{{item.value}}" # not required. The string value to be associated with an I(option). May be omitted when removing an I(option).
+      #allow_no_value: false # not required. allow option without value and without '=' symbol
+      state: present # not required. choices: absent;present. If set to C(absent) the option or section will be removed if present instead of created.
+      #mode: undefined # not required. Mode the file or directory should be. For those used to I(/usr/bin/chmod) remember that modes are actually octal numbers. You must either add a leading zero so that Ansible's YAML parser knows it is an octal number (like C(0644) or C(01777)) or quote it (like C('644') or C('1777')) so Ansible receives a string and can do its own conversion from string into number.  Giving Ansible a number without following one of these rules will end up with a decimal number which will have unexpected results. As of version 1.8, the mode may be specified as a symbolic mode (for example, C(u+rwx) or C(u=rw,g=r,o=r)).
+      #others: undefined # not required. All arguments accepted by the M(file) module also work here
+      owner: "{{zbx_server_shell_user_name}}" # not required. Name of the user that should own the file/directory, as would be fed to I(chown).
+      #attributes: undefined # not required. Attributes the file or directory should have. To get supported flags look at the man page for I(chattr) on the target system. This string should contain the attributes in the same order as the one displayed by I(lsattr).,C(=) operator is assumed as default, otherwise C(+) or C(-) operators need to be included in the string.
+      #backup: no # not required. Create a backup file including the timestamp information so you can get the original file back if you somehow clobbered it incorrectly.
+      #create: yes # not required. If set to 'no', the module will fail if the file does not already exist. By default it will create the file if it is missing.
+      #setype: undefined # not required. Type part of SELinux file context, C(_default) feature works as for I(seuser).
+  with_items:
+    - { key: 'aws_access_key_id', value: '{{aws_access_key_id}}'}
+    - { key: 'aws_secret_access_key', value: '{{aws_secret_access_key}}'}
+
+- name: copy External Scripts
+  copy:
+      dest: "{{zbx_server_external_scripts_path}}" # required. Remote absolute path where the file should be copied to. If I(src) is a directory, this must be a directory too. If I(dest) is a nonexistent path and if either I(dest) ends with "/" or I(src) is a directory, I(dest) is created. If I(src) and I(dest) are files, the parent directory of I(dest) isn't created: the task fails if it doesn't already exist.
+      src: files/externalscripts/ # not required. Local path to a file to copy to the remote server; can be absolute or relative. If path is a directory, it is copied recursively. In this case, if path ends with "/", only inside contents of that directory are copied to destination. Otherwise, if it does not end with "/", the directory itself with all contents is copied. This behavior is similar to Rsync.
+      #directory_mode: undefined # not required. When doing a recursive copy set the mode for the directories. If this is not set we will use the system defaults. The mode is only set on directories which are newly created, and will not affect those that already existed.
+      #force: yes # not required. the default is C(yes), which will replace the remote file when contents are different than the source. If C(no), the file will only be transferred if the destination does not exist.
+      #remote_src: no # not required. If C(no), it will search for I(src) at originating/master machine.,If C(yes) it will go to the remote/target machine for the I(src). Default is C(no).,Currently I(remote_src) does not support recursive copying.,I(remote_src) only works with C(mode=preserve) as of version 2.6.
+      #checksum: undefined # not required. SHA1 checksum of the file being transferred. Used to validate that the copy of the file was successful.,If this is not provided, ansible will use the local calculated checksum of the src file.
+      #seuser: undefined # not required. User part of SELinux file context. Will default to system policy, if applicable. If set to C(_default), it will use the C(user) portion of the policy if available.
+      #decrypt: yes # not required. This option controls the autodecryption of source files using vault.
+      #setype: undefined # not required. Type part of SELinux file context, C(_default) feature works as for I(seuser).
+      group: "{{zbx_server_shell_group_name}}" # not required. Name of the group that should own the file/directory, as would be fed to I(chown).
+      #content: undefined # not required. When used instead of I(src), sets the contents of a file directly to the specified value. For anything advanced or with formatting also look at the template module.
+      #unsafe_writes: no # not required. By default this module uses atomic operations to prevent data corruption or inconsistent reads from the target files, but sometimes systems are configured or just broken in ways that prevent this. One example is docker mounted files, which cannot be updated atomically from inside the container and can only be written in an unsafe manner.,This option allows Ansible to fall back to unsafe methods of updating files when atomic operations fail (however, it doesn't force Ansible to perform unsafe writes). IMPORTANT! Unsafe writes are subject to race conditions and can lead to data corruption.
+      #serole: undefined # not required. Role part of SELinux file context, C(_default) feature works as for I(seuser).
+      mode: "u+rx,g+rx" # not required. Mode the file or directory should be. For those used to I(/usr/bin/chmod) remember that modes are actually octal numbers. You must either add a leading zero so that Ansible's YAML parser knows it is an octal number (like C(0644) or C(01777)) or quote it (like C('644') or C('1777')) so Ansible receives a string and can do its own conversion from string into number.  Giving Ansible a number without following one of these rules will end up with a decimal number which will have unexpected results.  As of version 1.8, the mode may be specified as a symbolic mode (for example, C(u+rwx) or C(u=rw,g=r,o=r)).  As of version 2.3, the mode may also be the special string C(preserve).  C(preserve) means that the file will be given the same permissions as the source file.
+      #selevel: s0 # not required. Level part of the SELinux file context. This is the MLS/MCS attribute, sometimes known as the C(range). C(_default) feature works as for I(seuser).
+      owner: "{{zbx_server_shell_user_name}}" # not required. Name of the user that should own the file/directory, as would be fed to I(chown).
+      #follow: no # not required. This flag indicates that filesystem links in the destination, if they exist, should be followed.
+      #validate: undefined # not required. The validation command to run before copying into place. The path to the file to validate is passed in via '%s' which must be present as in the example below. The command is passed securely so shell features like expansion and pipes won't work.
+      #attributes: undefined # not required. Attributes the file or directory should have. To get supported flags look at the man page for I(chattr) on the target system. This string should contain the attributes in the same order as the one displayed by I(lsattr).,C(=) operator is assumed as default, otherwise C(+) or C(-) operators need to be included in the string.
+      #backup: no # not required. Create a backup file including the timestamp information so you can get the original file back if you somehow clobbered it incorrectly.
+      #local_follow: yes # not required. This flag indicates that filesystem links in the source tree, if they exist, should be followed.

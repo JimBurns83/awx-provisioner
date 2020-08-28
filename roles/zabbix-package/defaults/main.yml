@@ -1,0 +1,5 @@
+---
+# defaults file for zabbix-package
+zabbix_package_version: 5.0
+zabbix_backend_db: pgsql
+#zabbix_backend_db: mysql

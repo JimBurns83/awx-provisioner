@@ -1,0 +1,23 @@
+---
+- name: "{{missing_folder}}"
+  set_fact: 
+    folder_path: "{{missing_folder.path}}"
+- name: Find missing files
+  become: yes
+  #shell:  ls -d */ | grep -v "addons_more"
+  #args:
+  #  chdir: /opt/odoo12-ontix/addons_available/
+
+  find:
+    paths: "{{folder_path}}"
+    recurse: yes
+    file_type: any # not required. choices: any;directory;file;link. Type of file to select.,The 'link' and 'any' choices were added in version 2.3.
+    #excludes: ".git*"
+    #use_regex: yes
+  register: missing_files
+- name: Symlink Missing Files
+  include_tasks: link_missing.yml
+  with_items:  "{{missing_files.files}}"
+    #- "{{moresubdirs}}"
+  loop_control:
+      loop_var: missing_file

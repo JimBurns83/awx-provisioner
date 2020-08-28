@@ -1,0 +1,110 @@
+- name: get user to test
+  uri:
+    url: "{{zabbix_api_url}}/api_jsonrpc.php"
+    method: POST
+    #body: "{ \"jsonrpc\": \"2.0\", \"method\" : \"user.get\", \"params\": { \"output\":\"extend\" }, \"id\": 1 }"
+    body:
+      jsonrpc: "2.0"
+      method: "user.get"
+      params: 
+        output: "extend"
+      auth: "{{ZABAPIAUTH}}"
+      id: "2"
+    body_format: json
+    return_content: yes
+  register: json_response 
+
+- name: output variable
+  debug:
+    msg: "{{(json_response.content| from_json)['result']}}"
+  
+
+- name: get actions
+  uri:
+    url: "{{zabbix_api_url}}/api_jsonrpc.php"
+    method: POST
+    #body: "{ \"jsonrpc\": \"2.0\", \"method\" : \"user.get\", \"params\": { \"output\":\"extend\" }, \"id\": 1 }"
+    body:
+      jsonrpc: "2.0"
+      method: "action.get"
+      params: 
+        output: "extend"
+        selectOperations: "extend"
+        selectRecoveryOperations: "extend"
+        selectFilter: "extend"
+        filter: 
+          eventsource: 2
+      auth: "{{ZABAPIAUTH}}"
+      id: "1"
+    body_format: json
+    return_content: yes
+  register: json_response 
+- name: output response
+  debug:
+    msg: "{{(json_response.content|from_json)}}"
+- name: auto reg
+  uri:
+    url: "{{zabbix_api_url}}/api_jsonrpc.php"
+    method: POST
+    #body: "{ \"jsonrpc\": \"2.0\", \"method\" : \"user.get\", \"params\": { \"output\":\"extend\" }, \"id\": 1 }"
+    body:
+      jsonrpc: '2.0'
+      method: "action.create"
+      params:
+        name: "Auto Registration Action"
+        status: '0'
+        eventsource: '2'
+        esc_period: 1h
+        operations:
+          opmessage_usr: []
+          esc_step_from: '1'
+          esc_period: '0'
+          evaltype: '0'
+          opmessage:
+            mediatypeid: '0'
+            default_msg: '1'
+            subject: 'Auto registration: {HOST.HOST}'
+            message: "Host name: {HOST.HOST}\r\nHost IP: {HOST.IP}\r\nAgent port: {HOST.PORT}"
+            operationid: '11'
+          opconditions: []
+          esc_step_to: '1'
+          #actionid: '7'
+          operationtype: '0'
+          operationid: '11'
+          opmessage_grp:
+            usrgrpid: '7'
+            operationid: '11'
+          operationtype: '2'
+          esc_period: '0'
+          evaltype: '0'
+          opconditions: []
+          esc_step_to: '1'
+          actionid: '7'
+          esc_step_from: '1'
+          operationid: '12'
+        def_shortdata: 'Auto registration: {HOST.HOST}'
+        recoveryOperations: []
+        
+        #pause_suppressed: '1'
+        def_longdata: "Host name: {HOST.HOST}\r\nHost IP: {HOST.IP}\r\nAgent port: {HOST.PORT}"
+        #filter:
+          #formula: ''
+          #evaltype: '0'
+          #conditions: []
+          #eval_formula: ''
+        ack_shortdata: ''
+        
+        #actionid: '7'
+        ack_longdata: ''
+        r_shortdata: ''
+        r_longdata: ''
+        
+      auth: "{{ZABAPIAUTH}}"
+      id: '1'
+
+    body_format: json
+    return_content: yes
+  register: json_response 
+- name: output response
+  debug:
+    msg: "{{(json_response.content|from_json)}}"

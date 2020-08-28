@@ -1,0 +1,60 @@
+#create file
+#itterate lines in file
+- name: get parameters for {{zbx_user_parameter}}
+  set_fact:
+    userparams: "{{(zbx_user_parameters[(zbx_user_parameter)])}}"
+- name: user params
+  lineinfile:
+      path: "{{zbx_agent_conf_d}}/{{zbx_user_parameter}}.conf"  # required. The file to modify.,Before 2.3 this option was only usable as I(dest), I(destfile) and I(name).
+      #validate: undefined # not required. The validation command to run before copying into place. The path to the file to validate is passed in via '%s' which must be present as in the example below. The command is passed securely so shell features like expansion and pipes won't work.
+      #seuser: undefined # not required. User part of SELinux file context. Will default to system policy, if applicable. If set to C(_default), it will use the C(user) portion of the policy if available.
+      #group: undefined # not required. Name of the group that should own the file/directory, as would be fed to I(chown).
+      #insertbefore: BOF # not required. choices: BOF;*regex*. Used with C(state=present). If specified, the line will be inserted before the last match of specified regular expression. If the first match is required, use(firstmatch=yes). A value is available; C(BOF) for inserting the line at the beginning of the file. If specified regular expression has no matches, the line will be inserted at the end of the file. If regular expressions are passed to both C(regexp) and C(insertbefore), C(insertbefore) is only honored if no match for C(regexp) is found. May not be used with C(backrefs).
+      #unsafe_writes: no # not required. By default this module uses atomic operations to prevent data corruption or inconsistent reads from the target files, but sometimes systems are configured or just broken in ways that prevent this. One example is docker mounted files, which cannot be updated atomically from inside the container and can only be written in an unsafe manner.,This option allows Ansible to fall back to unsafe methods of updating files when atomic operations fail (however, it doesn't force Ansible to perform unsafe writes). IMPORTANT! Unsafe writes are subject to race conditions and can lead to data corruption.
+      #selevel: s0 # not required. Level part of the SELinux file context. This is the MLS/MCS attribute, sometimes known as the C(range). C(_default) feature works as for I(seuser).
+      create: yes # not required. Used with C(state=present). If specified, the file will be created if it does not already exist. By default it will fail if the file is missing.
+      #others: undefined # not required. All arguments accepted by the M(file) module also work here.
+      #serole: undefined # not required. Role part of SELinux file context, C(_default) feature works as for I(seuser).
+      #backrefs: no # not required. Used with C(state=present). If set, C(line) can contain backreferences (both positional and named) that will get populated if the C(regexp) matches. This flag changes the operation of the module slightly; C(insertbefore) and C(insertafter) will be ignored, and if the C(regexp) doesn't match anywhere in the file, the file will be left unchanged. If the C(regexp) does match, the last matching line will be replaced by the expanded line parameter.
+      #owner: undefined # not required. Name of the user that should own the file/directory, as would be fed to I(chown).
+      state: present # not required. choices: absent;present. Whether the line should be there or not.
+      #mode: undefined # not required. Mode the file or directory should be. For those used to I(/usr/bin/chmod) remember that modes are actually octal numbers. You must either add a leading zero so that Ansible's YAML parser knows it is an octal number (like C(0644) or C(01777)) or quote it (like C('644') or C('1777')) so Ansible receives a string and can do its own conversion from string into number.  Giving Ansible a number without following one of these rules will end up with a decimal number which will have unexpected results. As of version 1.8, the mode may be specified as a symbolic mode (for example, C(u+rwx) or C(u=rw,g=r,o=r)).
+      #firstmatch: no # not required. Used with C(insertafter) or C(insertbefore). If set, C(insertafter) and C(inserbefore) find a first line has regular expression matches.
+      #insertafter: EOF # not required. choices: EOF;*regex*. Used with C(state=present). If specified, the line will be inserted after the last match of specified regular expression. If the first match is required, use(firstmatch=yes). A special value is available; C(EOF) for inserting the line at the end of the file. If specified regular expression has no matches, EOF will be used instead. If regular expressions are passed to both C(regexp) and C(insertafter), C(insertafter) is only honored if no match for C(regexp) is found. May not be used with C(backrefs).
+      #regexp: undefined # not required. The regular expression to look for in every line of the file. For C(state=present), the pattern to replace if found. Only the last line found will be replaced. For C(state=absent), the pattern of the line(s) to remove. Uses Python regular expressions. See U(http://docs.python.org/2/library/re.html).
+      #attributes: undefined # not required. Attributes the file or directory should have. To get supported flags look at the man page for I(chattr) on the target system. This string should contain the attributes in the same order as the one displayed by I(lsattr).,C(=) operator is assumed as default, otherwise C(+) or C(-) operators need to be included in the string.
+      #backup: no # not required. Create a backup file including the timestamp information so you can get the original file back if you somehow clobbered it incorrectly.
+      line: "UserParameter={{userparam}}" # not required. Required for C(state=present). The line to insert/replace into the file. If C(backrefs) is set, may contain backreferences that will get expanded with the C(regexp) capture groups if the regexp matches.
+      #setype: undefined # not required. Type part of SELinux file context, C(_default) feature works as for I(seuser).
+  with_items: "{{userparams}}"
+  loop_control:
+    loop_var: userparam
+- name: user params
+  lineinfile:
+      path: "{{zbx_agent_conf_d}}/{{zbx_user_parameter}}.conf"  # required. The file to modify.,Before 2.3 this option was only usable as I(dest), I(destfile) and I(name).
+      state: absent # not required. choices: absent;present. Whether the line should be there or not.
+      line: "UserParameter=userparams"
+#- name: user params
+#  ini_file:
+#      section: null # required. Section name in INI file. This is added if C(state=present) automatically when a single value is being set.,If left empty or set to `null`, the I(option) will be placed before the first I(section). Using `null` is also required if the config format does not support sections.
+#      path: "{{zbx_agent_conf_d}}/{{zbx_user_parameter}}.conf" # required. Path to the INI-style file; this file is created if required.,Before 2.3 this option was only usable as I(dest).
+#      #seuser: undefined # not required. User part of SELinux file context. Will default to system policy, if applicable. If set to C(_default), it will use the C(user) portion of the policy if available.
+#      #group: undefined # not required. Name of the group that should own the file/directory, as would be fed to I(chown).
+#      option: UserParameter # not required. If set (required for changing a I(value)), this is the name of the option.,May be omitted if adding/removing a whole I(section).
+#      #unsafe_writes: no # not required. By default this module uses atomic operations to prevent data corruption or inconsistent reads from the target files, but sometimes systems are configured or just broken in ways that prevent this. One example is docker mounted files, which cannot be updated atomically from inside the container and can only be written in an unsafe manner.,This option allows Ansible to fall back to unsafe methods of updating files when atomic operations fail (however, it doesn't force Ansible to perform unsafe writes). IMPORTANT! Unsafe writes are subject to race conditions and can lead to data corruption.
+#      #selevel: s0 # not required. Level part of the SELinux file context. This is the MLS/MCS attribute, sometimes known as the C(range). C(_default) feature works as for I(seuser).
+#      no_extra_spaces: yes # not required. Do not insert spaces before and after '=' symbol
+#      serole: undefined # not required. Role part of SELinux file context, C(_default) feature works as for I(seuser).
+#      value: "{{zbx_user_parameters[(zbx_user_parameter)]}}" # not required. The string value to be associated with an I(option). May be omitted when removing an I(option).
+#      #allow_no_value: false # not required. allow option without value and without '=' symbol
+#      state: present # not required. choices: absent;present. If set to C(absent) the option or section will be removed if present instead of created.
+#      #mode: undefined # not required. Mode the file or directory should be. For those used to I(/usr/bin/chmod) remember that modes are actually octal numbers. You must either add a leading zero so that Ansible's YAML parser knows it is an octal number (like C(0644) or C(01777)) or quote it (like C('644') or C('1777')) so Ansible receives a string and can do its own conversion from string into number.  Giving Ansible a number without following one of these rules will end up with a decimal number which will have unexpected results. As of version 1.8, the mode may be specified as a symbolic mode (for example, C(u+rwx) or C(u=rw,g=r,o=r)).
+#      #others: undefined # not required. All arguments accepted by the M(file) module also work here
+#      #owner: undefined # not required. Name of the user that should own the file/directory, as would be fed to I(chown).
+#      #attributes: undefined # not required. Attributes the file or directory should have. To get supported flags look at the man page for I(chattr) on the target system. This string should contain the attributes in the same order as the one displayed by I(lsattr).,C(=) operator is assumed as default, otherwise C(+) or C(-) operators need to be included in the string.
+#      #backup: no # not required. Create a backup file including the timestamp information so you can get the original file back if you somehow clobbered it incorrectly.
+#      create: yes # not required. If set to 'no', the module will fail if the file does not already exist. By default it will create the file if it is missing.
+#      #setype: undefined # not required. Type part of SELinux file context, C(_default) feature works as for I(seuser).
+#  loop: "{{ zbx_user_parameters }}"
+#  loop_control:
+#    loop_var: userparam

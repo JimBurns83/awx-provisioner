@@ -1,0 +1,59 @@
+---
+- name: install prerequisites
+  pip:
+      #virtualenv: undefined # not required. An optional path to a I(virtualenv) directory to install into. It cannot be specified together with the 'executable' parameter (added in 2.1). If the virtualenv does not exist, it will be created before installing packages. The optional virtualenv_site_packages, virtualenv_command, and virtualenv_python options affect the creation of the virtualenv.
+      #virtualenv_site_packages: no # not required. Whether the virtual environment will inherit packages from the global site-packages directory.  Note that if this setting is changed on an already existing virtual environment it will not have any effect, the environment must be deleted and newly created.
+      #virtualenv_command: virtualenv # not required. The command or a pathname to the command to create the virtual environment with. For example C(pyvenv), C(virtualenv), C(virtualenv2), C(~/bin/virtualenv), C(/usr/local/bin/virtualenv).
+      #chdir: undefined # not required. cd into this directory before running the command
+      #requirements: undefined # not required. The path to a pip requirements file, which should be local to the remote system. File can be specified as a relative path if using the chdir option.
+      name: PyMySQL # not required. The name of a Python library to install or the url(bzr+,hg+,git+,svn+) of the remote package.,This can be a list (since 2.2) and contain version specifiers (since 2.7).
+      #virtualenv_python: undefined # not required. The Python executable used for creating the virtual environment. For example C(python3.5), C(python2.7). When not specified, the Python version used to run the ansible module is used. This parameter should not be used when C(virtualenv_command) is using C(pyvenv) or the C(-m venv) module.
+      #editable: no # not required. Pass the editable flag.
+      #umask: undefined # not required. The system umask to apply before installing the pip package. This is useful, for example, when installing on systems that have a very restrictive umask by default (e.g., 0077) and you want to pip install packages which are to be used by all users. Note that this requires you to specify desired umask mode in octal, with a leading 0 (e.g., 0077).
+      executable: pip3 # not required. The explicit executable or a pathname to the executable to be used to run pip for a specific version of Python installed in the system. For example C(pip-3.3), if there are both Python 2.7 and 3.3 installations in the system and you want to run pip for the Python 3.3 installation. It cannot be specified together with the 'virtualenv' parameter (added in 2.1). By default, it will take the appropriate version for the python interpreter use by ansible, e.g. pip3 on python 3, and pip2 or pip on python 2.
+      #extra_args: undefined # not required. Extra arguments passed to pip.
+      state: present # not required. choices: absent;forcereinstall;latest;present. The state of module,The 'forcereinstall' option is only available in Ansible 2.1 and above.
+      #version: undefined # not required. The version number to install of the Python library specified in the I(name) parameter.
+- name: create {{zbx_db_user}} user
+  mysql_user:
+      name: "{{zbx_db_user}}" # required. name of the user (role) to add or remove
+      #login_port: 3306 # not required. Port of the MySQL server. Requires I(login_host) be defined as other then localhost if login_port is used.
+      update_password: always # not required. choices: always;on_create. C(always) will update passwords if they differ.  C(on_create) will only set the password for newly created users.
+      #ssl_cert: undefined # not required. The path to a client public key certificate.
+      #config_file: ~/.my.cnf # not required. Specify a config file from which user and password are to be read.
+      #ssl_key: undefined # not required. The path to the client private key.
+      #encrypted: no # not required. Indicate that the 'password' field is a `mysql_native_password` hash
+      login_host: "{{zbx_db_host}}" # not required. Host running the database.
+      #append_privs: no # not required. Append the privileges defined by priv to the existing ones for this user instead of overwriting existing ones.
+      #sql_log_bin: yes # not required. Whether binary logging should be enabled or disabled for the connection.
+      #host_all: no # not required. override the host option, making ansible apply changes to all hostnames for a given user.  This option cannot be used when creating users
+      #ssl_ca: undefined # not required. The path to a Certificate Authority (CA) certificate. This option, if used, must specify the same certificate as used by the server.
+      login_password: "{{mariadb_niceroot_pass}}" # not required. The password used to authenticate with.
+      #login_unix_socket: undefined # not required. The path to a Unix domain socket for local connections.
+      state: present # not required. choices: present;absent. Whether the user should exist.  When C(absent), removes the user.
+      login_user: "niceroot" # not required. The username used to authenticate with.
+      #host:  "{{zbx_db_host}}" # not required. the 'host' part of the MySQL username
+      #check_implicit_admin: no # not required. Check if mysql allows login as root/nopassword before trying supplied credentials.
+      password:  "{{zbx_db_password}}" # not required. set the user's password.
+      connect_timeout: 30 # not required. The connection timeout when connecting to the MySQL server.
+      #priv: undefined # not required. MySQL privileges string in the format: C(db.table:priv1,priv2).,Multiple privileges can be specified by separating each one using a forward slash: C(db.table:priv/db.table:priv).,The format is based on MySQL C(GRANT) statement.,Database and table names can be quoted, MySQL-style.,If column privileges are used, the C(priv1,priv2) part must be exactly as returned by a C(SHOW GRANT) statement. If not followed, the module will always report changes. It includes grouping columns by permission (C(SELECT(col1,col2)) instead of C(SELECT(col1),SELECT(col2))).
+#- name: create {{zbx_db_name}} database
+#  mysql_db:
+#      name: "{{zbx_db_name}}" # required. name of the database to add or remove,name=all May only be provided if I(state) is C(dump) or C(import).,if name=all Works like --all-databases option for mysqldump (Added in 2.0)
+      #login_port: 3306 # not required. Port of the MySQL server. Requires I(login_host) be defined as other then localhost if login_port is used.
+      #ssl_cert: undefined # not required. The path to a client public key certificate.
+      #config_file: ~/.my.cnf # not required. Specify a config file from which user and password are to be read.
+      #target: undefined # not required. Location, on the remote host, of the dump file to read from or write to. Uncompressed SQL files (C(.sql)) as well as bzip2 (C(.bz2)), gzip (C(.gz)) and xz (Added in 2.0) compressed files are supported.
+      #login_unix_socket: undefined # not required. The path to a Unix domain socket for local connections.
+      #encoding: undefined # not required. Encoding mode to use, examples include C(utf8) or C(latin1_swedish_ci)
+      #login_user: undefined # not required. The username used to authenticate with.
+      #login_host: localhost # not required. Host running the database.
+      #login_password: undefined # not required. The password used to authenticate with.
+      #ssl_key: undefined # not required. The path to the client private key.
+      #ssl_ca: undefined # not required. The path to a Certificate Authority (CA) certificate. This option, if used, must specify the same certificate as used by the server.
+      #collation: undefined # not required. Collation mode (sorting). This only applies to new table/databases and does not update existing ones, this is a limitation of MySQL.
+#      state: present # not required. choices: present;absent;dump;import. The database state
+      #ignore_tables:  # not required. A list of table names that will be ignored in the dump of the form database_name.table_name
+      #quick: yes # not required. Option used for dumping large tables
+      #single_transaction: no # not required. Execute the dump in a single transaction
+      #connect_timeout: 30 # not required. The connection timeout when connecting to the MySQL server.

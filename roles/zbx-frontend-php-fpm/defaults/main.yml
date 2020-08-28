@@ -1,0 +1,7 @@
+---
+# defaults file for zbx-frontend-php-fpm
+zbx_git_repo: "https://github.com/zabbix/zabbix.git"
+zbx_git_branch: "release/4.2"
+zbx_base_dir : /opt/zbx-fpm
+zbx_git_frontend:
+  - "frontends"

@@ -1,0 +1,55 @@
+---
+- name: Find missing files
+  become: yes
+  #shell:  ls -d */ | grep -v "addons_more"
+  #args:
+  #  chdir: /opt/odoo12-ontix/addons_available/
+
+  find:
+    paths: "~{{zbx_server_shell_user_name}}/src-missing/"
+    recurse: no
+    file_type: file # not required. choices: any;directory;file;link. Type of file to select.,The 'link' and 'any' choices were added in version 2.3.
+    excludes: ".git*"
+    #use_regex: yes
+  register: missing_files
+  tags:
+    - "test"
+- name: output variable
+  debug:
+    msg: "{{missing_files}}"
+  tags:
+    - "test"
+- name: Symlink Missing Files
+  include_tasks: link_missing.yml
+  with_items:  "{{missing_files.files}}"
+    #- "{{moresubdirs}}"
+  loop_control:
+      loop_var: missing_file
+  tags:
+    - "test"
+
+#now reitterate folders excluding git
+- name: Find missing files
+  become: yes
+  #shell:  ls -d */ | grep -v "addons_more"
+  #args:
+  #  chdir: /opt/odoo12-ontix/addons_available/
+
+  find:
+    paths: "~{{zbx_server_shell_user_name}}/src-missing/"
+    recurse: no
+    file_type: directory # not required. choices: any;directory;file;link. Type of file to select.,The 'link' and 'any' choices were added in version 2.3.
+    excludes: ".git*"
+    #use_regex: yes
+  register: missing_folders
+- name: output variable
+  debug:
+    msg: "{{missing_folders}}"
+- name: Itter Missing Folders
+  include_tasks: itter_missing_folder.yml
+  with_items:  "{{missing_folders.files}}"
+    #- "{{moresubdirs}}"
+  loop_control:
+      loop_var: missing_folder
+  tags:
+    - "test"

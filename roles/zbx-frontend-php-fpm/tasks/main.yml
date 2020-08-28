@@ -1,0 +1,3 @@
+---
+# tasks file for zbx-frontend-php-fpm
+- include_tasks: "{{ansible_distribution}}.yml"

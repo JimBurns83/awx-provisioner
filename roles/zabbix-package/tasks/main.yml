@@ -1,0 +1,33 @@
+---
+# tasks file for zabbix-package
+- name: add key
+  apt_key:
+      keyserver: "keyserver.ubuntu.com" # not required. The keyserver to retrieve key from.
+      #url: undefined # not required. The URL to retrieve key from.
+      #data: undefined # not required. The keyfile contents to add to the keyring.
+      #keyring: undefined # not required. The full path to specific keyring file in /etc/apt/trusted.gpg.d/
+      state: present # not required. choices: absent;present. Ensures that the key is present (added) or absent (revoked).
+      #file: undefined # not required. The path to a keyfile on the remote server to add to the keyring.
+      validate_certs: yes # not required. If C(no), SSL certificates for the target url will not be validated. This should only be used on personally controlled sites using self-signed certificates.
+      id: "082AB56BA14FE591" # not required. The identifier of the key.,Including this allows check mode to correctly report the changed state.,If specifying a subkey's id be aware that apt-key does not understand how to remove keys via a subkey id.  Specify the primary key's id instead.,This parameter is required when C(state) is set to C(absent).
+#    url: "https://repo.zabbix.com/zabbix/4.4/ubuntu/dists/{{ansible_distribution_release}}/Release.gpg"
+#    state: "present"
+- name: add repository
+  apt_repository:
+      repo: "deb https://repo.zabbix.com/zabbix/{{zabbix_package_version}}/ubuntu/ {{ansible_distribution_release}} main" # required. A source string for the repository.
+      state: present # not required. choices: absent;present. A source string state.
+      update_cache: yes # not required. Run the equivalent of C(apt-get update) when a change occurs.  Cache updates are run after making changes.
+      #mode: 0644 # not required. The octal mode for newly created files in sources.list.d
+      #codename: undefined # not required. Override the distribution codename to use for PPA repositories. Should usually only be set when working with a PPA on a non-Ubuntu target (e.g. Debian or Mint)
+      #validate_certs: yes # not required. If C(no), SSL certificates for the target repo will not be validated. This should only be used on personally controlled sites using self-signed certificates.
+      #filename: undefined # not required. Sets the name of the source list file in sources.list.d. Defaults to a file name based on the repository source url. The .list extension will be automatically added.
+- name: Install Packages
+  package:
+      state: present # required. Whether to install (C(present)), or remove (C(absent)) a package. Other states depend on the underlying package module, i.e C(latest).
+      name: {{item}} # required. Package name, or package specifier with version, like C(name-1.0).,Be aware that packages are not always named the same and this module will not 'translate' them per distro.
+      #use: auto # not required. The required package manager module to use (yum, apt, etc). The default 'auto' will use existing facts or try to autodetect it.,You should only use this field if the automatic selection is not working for some reason.
+  with:
+    - "php7.2-{{zabbix_backend_db}}"
+    - "zabbix-server-{{zabbix_backend_db}}"
+    - "zabbix-frontend-php"
+    - "zabbix-agent"
