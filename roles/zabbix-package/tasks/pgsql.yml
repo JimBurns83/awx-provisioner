@@ -1,5 +1,8 @@
-
-- name: install ansible requirements
+- name: install ansible package requirement
+  package:
+    name: postgresql-client-common
+    state: present
+- name: install ansible python requirement
   pip:
       #virtualenv: undefined # not required. An optional path to a I(virtualenv) directory to install into. It cannot be specified together with the 'executable' parameter (added in 2.1). If the virtualenv does not exist, it will be created before installing packages. The optional virtualenv_site_packages, virtualenv_command, and virtualenv_python options affect the creation of the virtualenv.
       #virtualenv_site_packages: no # not required. Whether the virtual environment will inherit packages from the global site-packages directory.  Note that if this setting is changed on an already existing virtual environment it will not have any effect, the environment must be deleted and newly created.
