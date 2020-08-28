@@ -1,0 +1,49 @@
+- name: create User
+  postgresql_user:
+      name: zabbix # required. Name of the user (role) to add or remove.
+      #ssl_rootcert: undefined # not required. Specifies the name of a file containing SSL certificate authority (CA) certificate(s). If the file exists, the server's certificate will be verified to be signed by one of these authorities.
+      #ssl_mode: disable # not required. choices: disable;allow;prefer;require;verify-ca;verify-full. Determines whether or with what priority a secure SSL TCP/IP connection will be negotiated with the server.,See U(https://www.postgresql.org/docs/current/static/libpq-ssl.html) for more information on the modes.,Default of C(prefer) matches libpq default.
+      login_user: postgres # not required. User (role) used to authenticate with PostgreSQL.
+      login_host: "{{db_login_host}}" # not required. Host running PostgreSQL.
+      #expires: undefined # not required. The date at which the user's password is to expire.,If set to C('infinity'), user's password never expire.,Note that this value should be a valid SQL date and time type.
+      #db: undefined # not required. Name of database where permissions will be granted.
+      #conn_limit: undefined # not required. Specifies the user connection limit.
+      #login_unix_socket: undefined # not required. Path to a Unix domain socket for local connections.
+      login_password: undefined # not required. Password used to authenticate with PostgreSQL.
+      password: zabbix # not required. Set the user's password, before 1.4 this was required.,Password can be passed unhashed or hashed (MD5-hashed).,Unhashed password will automatically be hashed when saved into the database if C(encrypted) parameter is set, otherwise it will be save in plain text format.,When passing a hashed password it must be generated with the format C('str["md5"] + md5[ password + username ]'), resulting in a total of 35 characters. An easy way to do this is C(echo "md5$(echo -n 'verysecretpasswordJOE' | md5sum)").,Note that if the provided password string is already in MD5-hashed format, then it is used as-is, regardless of C(encrypted) parameter.
+      port: 5432 # not required. Database port to connect to.
+      #fail_on_user: yes # not required. If C(yes), fail when user can't be removed. Otherwise just log and continue.
+      #priv: undefined # not required. PostgreSQL privileges string in the format: C(table:priv1,priv2).
+      #no_password_changes: no # not required. If C(yes), don't inspect database for password changes. Effective when C(pg_authid) is not accessible (such as AWS RDS). Otherwise, make password changes as necessary.
+      state: present # not required. choices: present;absent. The user (role) state.
+      encrypted: yes # not required. Whether the password is stored hashed in the database. Passwords can be passed already hashed or unhashed, and postgresql ensures the stored password is hashed when C(encrypted) is set.,Note: Postgresql 10 and newer doesn't support unhashed passwords.,Previous to Ansible 2.6, this was C(no) by default.
+      role_attr_flags: "CREATEDB,SUPERUSER" # not required. choices: [NO]SUPERUSER;[NO]CREATEROLE;[NO]CREATEDB;[NO]INHERIT;[NO]LOGIN;[NO]REPLICATION;[NO]BYPASSRLS. PostgreSQL role attributes string in the format: CREATEDB,CREATEROLE,SUPERUSER.,Note that '[NO]CREATEUSER' is deprecated.
+- name: create database
+  postgresql_db:
+      name: zabbix # required. name of the database to add or remove
+      #ssl_rootcert: undefined # not required. Specifies the name of a file containing SSL certificate authority (CA) certificate(s).,If the file exists, the server's certificate will be verified to be signed by one of these authorities.
+      #ssl_mode: disable # not required. choices: disable;allow;prefer;require;verify-ca;verify-full. Determines whether or with what priority a secure SSL TCP/IP connection will be negotiated with the server.,See https://www.postgresql.org/docs/current/static/libpq-ssl.html for more information on the modes.,Default of C(prefer) matches libpq default.
+      #login_unix_socket: undefined # not required. Path to a Unix domain socket for local connections
+      #encoding: undefined # not required. Encoding of the database
+      login_user: postgres # not required. The username used to authenticate with
+      #lc_collate: undefined # not required. Collation order (LC_COLLATE) to use in the database. Must match collation order of template database unless C(template0) is used as template.
+      #target_opts: undefined # not required. Further arguments for pg_dump or pg_restore. Used when state is "dump" or "restore"
+      #lc_ctype: undefined # not required. Character classification (LC_CTYPE) to use in the database (e.g. lower, upper, ...) Must match LC_CTYPE of template database unless C(template0) is used as template.
+      port: 5432 # not required. Database port to connect to.
+      owner: zabbix # not required. Name of the role to set as owner of the database
+      state: restore # not required. choices: present;absent;dump;restore. The database state. present implies that the database should be created if necessary.
+  #absent implies that the database should be removed if present.
+  #dump requires a target definition to which the database will be backed up.
+  #(Added in 2.4) restore also requires a target definition from which the database will be restored.
+  #(Added in 2.4) The format of the backup will be detected based on the target name.
+  #Supported compression formats for dump and restore are: .bz2, .gz, and .xz
+  #Supported formats for dump and restore are: .sql and .tar
+  
+ #     template: undefined # not required. Template used to create the database
+      login_password: undefined # not required. The password used to authenticate with
+      maintenance_db: postgres # not required. The value specifies the initial database (which is also called as maintenance DB) that Ansible connects to.
+      login_host: "{{db_login_host}}" # not required. Host running the database
+      target: "/usr/share/doc/zabbix-server-pgsql/create.sql.gz" # not required. File to back up or restore from. Used when state is "dump" or "restore"
+  register: createdb
+#- name: something
+#  post

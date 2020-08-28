@@ -8,4 +8,5 @@ fpm_timezone: "Europe/London"
 fpm_listen: "/run/php/php7.4-fpm.sock"
 #zabbix_backend_db: mysql
 nginx_listen: "listen 80 default_server;"
+db_login_host: "192.168.178.209"
 #        listen          80;

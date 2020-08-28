@@ -105,3 +105,8 @@
     src: "/etc/zabbix/nginx.conf"
     dest: "/etc/nginx/sites-enabled/default"
     state: link
+- name: restart nginx
+  service:
+    name: nginx
+    state: restarted
+- include_tasks: "{{zabbix_backend_db}}.yml"
