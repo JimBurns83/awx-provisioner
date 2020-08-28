@@ -3,7 +3,7 @@
   gather_facts: true #now python is installed
   become: true
   roles:
-    - zabbix-web-fpm
-    - zabbix-server
-    - zabbix-agent
+    #- zabbix-web-fpm
+    - zabbix-package
+    #- zabbix-agent
     #- awscli-minio 
