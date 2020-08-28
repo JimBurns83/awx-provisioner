@@ -2,6 +2,8 @@
 # defaults file for zabbix-package
 zabbix_package_version: 5.0
 zabbix_backend_db: pgsql
+zabbix_frontend_db: POSTGRESQL
+zabbix_server_name: openstacck
 php_version: 7.4
 #fpm_listen: 81
 fpm_timezone: "Europe/London"
@@ -10,3 +12,7 @@ fpm_listen: "/run/php/php7.4-fpm.sock"
 nginx_listen: "listen 80 default_server;"
 db_login_host: "192.168.178.209"
 #        listen          80;
+dbname: zabbix
+dbuser: zabbix
+dbpass: zabbix
+dbport: 5432
