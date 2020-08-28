@@ -62,7 +62,7 @@
       login_password: undefined # not required. The password used to authenticate with
       maintenance_db: postgres # not required. The value specifies the initial database (which is also called as maintenance DB) that Ansible connects to.
       login_host: "{{db_login_host}}" # not required. Host running the database
-
+  register: createdb
 - name: create tables
   postgresql_db:
       name: zabbix # required. name of the database to add or remove
@@ -88,7 +88,34 @@
       login_password: undefined # not required. The password used to authenticate with
       maintenance_db: postgres # not required. The value specifies the initial database (which is also called as maintenance DB) that Ansible connects to.
       login_host: "{{db_login_host}}" # not required. Host running the database
-      target: "/usr/share/doc/zabbix-server-pgsql/create.sql" # not required. File to back up or restore from. Used when state is "dump" or "restore"
-  register: createdb
+      target: "/usr/share/doc/zabbix-server-pgsql/create.sql.gz" # not required. File to back up or restore from. Used when state is "dump" or "restore"
+  #when: createdb.changed
+- name: create tables
+  postgresql_db:
+      name: zabbix # required. name of the database to add or remove
+      #ssl_rootcert: undefined # not required. Specifies the name of a file containing SSL certificate authority (CA) certificate(s).,If the file exists, the server's certificate will be verified to be signed by one of these authorities.
+      #ssl_mode: disable # not required. choices: disable;allow;prefer;require;verify-ca;verify-full. Determines whether or with what priority a secure SSL TCP/IP connection will be negotiated with the server.,See https://www.postgresql.org/docs/current/static/libpq-ssl.html for more information on the modes.,Default of C(prefer) matches libpq default.
+      #login_unix_socket: undefined # not required. Path to a Unix domain socket for local connections
+      #encoding: undefined # not required. Encoding of the database
+      login_user: zabbix # not required. The username used to authenticate with
+      #lc_collate: undefined # not required. Collation order (LC_COLLATE) to use in the database. Must match collation order of template database unless C(template0) is used as template.
+      #target_opts: undefined # not required. Further arguments for pg_dump or pg_restore. Used when state is "dump" or "restore"
+      #lc_ctype: undefined # not required. Character classification (LC_CTYPE) to use in the database (e.g. lower, upper, ...) Must match LC_CTYPE of template database unless C(template0) is used as template.
+      port: 5432 # not required. Database port to connect to.
+      owner: zabbix # not required. Name of the role to set as owner of the database
+      state: restore # not required. choices: present;absent;dump;restore. The database state. present implies that the database should be created if necessary.
+  #absent implies that the database should be removed if present.
+  #dump requires a target definition to which the database will be backed up.
+  #(Added in 2.4) restore also requires a target definition from which the database will be restored.
+  #(Added in 2.4) The format of the backup will be detected based on the target name.
+  #Supported compression formats for dump and restore are: .bz2, .gz, and .xz
+  #Supported formats for dump and restore are: .sql and .tar
+  
+ #     template: undefined # not required. Template used to create the database
+      login_password: undefined # not required. The password used to authenticate with
+      maintenance_db: postgres # not required. The value specifies the initial database (which is also called as maintenance DB) that Ansible connects to.
+      login_host: "{{db_login_host}}" # not required. Host running the database
+      target: "/usr/share/doc/zabbix-server-pgsql/timescaledb.sql" # not required. File to back up or restore from. Used when state is "dump" or "restore"
+    #when: createdb.changed
 #- name: something
 #  post
