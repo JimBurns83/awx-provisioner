@@ -32,3 +32,49 @@
     - "zabbix-server-{{zabbix_backend_db}}"
     - "zabbix-frontend-php"
     - "zabbix-agent"
+- name: set listen
+  ini_file:
+      section: 
+      path: "/etc/php/{{php_version}}/fpm/pool.d/www.conf" # required. Path to the INI-style file; this file is created if required.,Before 2.3 this option was only usable as I(dest).
+      #seuser: undefined # not required. User part of SELinux file context. Will default to system policy, if applicable. If set to C(_default), it will use the C(user) portion of the policy if available.
+      #group: undefined # not required. Name of the group that should own the file/directory, as would be fed to I(chown).
+      option: "listen"  # not required. If set (required for changing a I(value)), this is the name of the option.,May be omitted if adding/removing a whole I(section).
+      #unsafe_writes: no # not required. By default this module uses atomic operations to prevent data corruption or inconsistent reads from the target files, but sometimes systems are configured or just broken in ways that prevent this. One example is docker mounted files, which cannot be updated atomically from inside the container and can only be written in an unsafe manner.,This option allows Ansible to fall back to unsafe methods of updating files when atomic operations fail (however, it doesn't force Ansible to perform unsafe writes). IMPORTANT! Unsafe writes are subject to race conditions and can lead to data corruption.
+      #selevel: s0 # not required. Level part of the SELinux file context. This is the MLS/MCS attribute, sometimes known as the C(range). C(_default) feature works as for I(seuser).
+      #no_extra_spaces: no # not required. Do not insert spaces before and after '=' symbol
+      #serole: undefined # not required. Role part of SELinux file context, C(_default) feature works as for I(seuser).
+      value: "{{fpm_listen}}" # not required. The string value to be associated with an I(option). May be omitted when removing an I(option).
+      #allow_no_value: false # not required. allow option without value and without '=' symbol
+      state: present # not required. choices: absent;present. If set to C(absent) the option or section will be removed if present instead of created.
+      #mode: undefined # not required. Mode the file or directory should be. For those used to I(/usr/bin/chmod) remember that modes are actually octal numbers. You must either add a leading zero so that Ansible's YAML parser knows it is an octal number (like C(0644) or C(01777)) or quote it (like C('644') or C('1777')) so Ansible receives a string and can do its own conversion from string into number.  Giving Ansible a number without following one of these rules will end up with a decimal number which will have unexpected results. As of version 1.8, the mode may be specified as a symbolic mode (for example, C(u+rwx) or C(u=rw,g=r,o=r)).
+      #others: undefined # not required. All arguments accepted by the M(file) module also work here
+      #owner: undefined # not required. Name of the user that should own the file/directory, as would be fed to I(chown).
+      #attributes: undefined # not required. Attributes the file or directory should have. To get supported flags look at the man page for I(chattr) on the target system. This string should contain the attributes in the same order as the one displayed by I(lsattr).,C(=) operator is assumed as default, otherwise C(+) or C(-) operators need to be included in the string.
+      #backup: no # not required. Create a backup file including the timestamp information so you can get the original file back if you somehow clobbered it incorrectly.
+      #create: yes # not required. If set to 'no', the module will fail if the file does not already exist. By default it will create the file if it is missing.
+      #setype: undefined # not required. Type part of SELinux file context, C(_default) feature works as for I(seuser).
+- name: set timezone
+  ini_file:
+      section: 
+      path: "/etc/php/{{php_version}}/fpm/php-fpm.conf" # required. Path to the INI-style file; this file is created if required.,Before 2.3 this option was only usable as I(dest).
+      #seuser: undefined # not required. User part of SELinux file context. Will default to system policy, if applicable. If set to C(_default), it will use the C(user) portion of the policy if available.
+      #group: undefined # not required. Name of the group that should own the file/directory, as would be fed to I(chown).
+      option: "php_value[date.timezone]"  # not required. If set (required for changing a I(value)), this is the name of the option.,May be omitted if adding/removing a whole I(section).
+      #unsafe_writes: no # not required. By default this module uses atomic operations to prevent data corruption or inconsistent reads from the target files, but sometimes systems are configured or just broken in ways that prevent this. One example is docker mounted files, which cannot be updated atomically from inside the container and can only be written in an unsafe manner.,This option allows Ansible to fall back to unsafe methods of updating files when atomic operations fail (however, it doesn't force Ansible to perform unsafe writes). IMPORTANT! Unsafe writes are subject to race conditions and can lead to data corruption.
+      #selevel: s0 # not required. Level part of the SELinux file context. This is the MLS/MCS attribute, sometimes known as the C(range). C(_default) feature works as for I(seuser).
+      #no_extra_spaces: no # not required. Do not insert spaces before and after '=' symbol
+      #serole: undefined # not required. Role part of SELinux file context, C(_default) feature works as for I(seuser).
+      value: "{{fpm_timezone}}" # not required. The string value to be associated with an I(option). May be omitted when removing an I(option).
+      #allow_no_value: false # not required. allow option without value and without '=' symbol
+      state: present # not required. choices: absent;present. If set to C(absent) the option or section will be removed if present instead of created.
+      #mode: undefined # not required. Mode the file or directory should be. For those used to I(/usr/bin/chmod) remember that modes are actually octal numbers. You must either add a leading zero so that Ansible's YAML parser knows it is an octal number (like C(0644) or C(01777)) or quote it (like C('644') or C('1777')) so Ansible receives a string and can do its own conversion from string into number.  Giving Ansible a number without following one of these rules will end up with a decimal number which will have unexpected results. As of version 1.8, the mode may be specified as a symbolic mode (for example, C(u+rwx) or C(u=rw,g=r,o=r)).
+      #others: undefined # not required. All arguments accepted by the M(file) module also work here
+      #owner: undefined # not required. Name of the user that should own the file/directory, as would be fed to I(chown).
+      #attributes: undefined # not required. Attributes the file or directory should have. To get supported flags look at the man page for I(chattr) on the target system. This string should contain the attributes in the same order as the one displayed by I(lsattr).,C(=) operator is assumed as default, otherwise C(+) or C(-) operators need to be included in the string.
+      #backup: no # not required. Create a backup file including the timestamp information so you can get the original file back if you somehow clobbered it incorrectly.
+      #create: yes # not required. If set to 'no', the module will fail if the file does not already exist. By default it will create the file if it is missing.
+      #setype: undefined # not required. Type part of SELinux file context, C(_default) feature works as for I(seuser).
+- name: restart fpm
+  service:
+    name: "php{{php_version}}-fpm"
+    state: restarted
