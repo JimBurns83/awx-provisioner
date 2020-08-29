@@ -29,7 +29,7 @@
       #cron_file: undefined # not required. If specified, uses this file instead of an individual user's crontab. If this is a relative path, it is interpreted with respect to /etc/cron.d. (If it is absolute, it will typically be /etc/crontab). Many linux distros expect (and some require) the filename portion to consist solely of upper- and lower-case letters, digits, underscores, and hyphens. To use the C(cron_file) parameter you must specify the C(user) as well.
       month: "*" # not required. Month of the year the job should run ( 1-12, *, */2, etc )
       #disabled: no # not required. If the job should be disabled (commented out) in the crontab.,Only has effect if C(state=present).
-      job: "pg_dump -Upostgres -h 127.0.0.1 -Fc > /backup/whole_db.dump" # not required. The command to execute or, if env is set, the value of environment variable. The command should not contain line breaks. Required if state=present.
+      job: "pg_dumpall -Upostgres -h 127.0.0.1 -Fc > /backup/whole_db.dump" # not required. The command to execute or, if env is set, the value of environment variable. The command should not contain line breaks. Required if state=present.
       #special_time: reboot # not required. choices: reboot;yearly;annually;monthly;weekly;daily;hourly. Special time specification nickname.
       user: root # not required. The specific user whose crontab should be modified.
       #insertafter: undefined # not required. Used with C(state=present) and C(env). If specified, the environment variable will be inserted after the declaration of specified environment variable.
