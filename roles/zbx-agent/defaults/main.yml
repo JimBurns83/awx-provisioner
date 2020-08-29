@@ -1,6 +1,7 @@
 ---
 # defaults file for zbx-agent
-zbx_server_ip: 10.32.3.98
+zabbix_package_version: 5.0
+zbx_server_ip: 192.168.178.198
 zbx_agent_script_root: /usr/share/zabbix-agent
 zbx_agent_conf_file: /etc/zabbix/zabbix_agentd.conf
 zbx_agent_conf_d: /etc/zabbix/zabbix_agentd.conf.d
@@ -8,8 +9,8 @@ zbx_agent_conf:
   LogFile: /var/log/zabbix-agent/zabbix_agentd.log
   LogFileSize: 0
   LogType: system
-  Server: 10.32.3.98
-  ServerActive: 10.32.3.98
+  Server: 192.168.178.198
+  ServerActive: 192.168.178.198
   Hostname: ""
   HostnameItem: system.hostname
   HostMetadata: 

@@ -1,11 +1,9 @@
 ---
-- hosts: zabbix
+- hosts: zabbix-agents
   gather_facts: true #now python is installed
   become: true
   roles:
     #- zabbix-web-fpm
-    - zabbix-package
-    - zbx-modifications
-    - zbx-server-scripts
-    #- zabbix-agent
+    #- zabbix-package
+    - zbx-agent
     #- awscli-minio 

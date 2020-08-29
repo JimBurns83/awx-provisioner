@@ -20,5 +20,5 @@
   set_fact:
     ZABAPIAUTH: "{{(json_response.content|from_json)['result']}}"
   when: auth_error == ""
-- include_tasks: authed.yml
-  when: auth_error == ""
+#- include_tasks: authed.yml
+#  when: auth_error == ""
