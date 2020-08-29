@@ -66,7 +66,7 @@
       path: "{{zbx_agent_conf_file}}" # required. Path to the INI-style file; this file is created if required.,Before 2.3 this option was only usable as I(dest).
       no_extra_spaces: yes # not required. Do not insert spaces before and after '=' symbol
       option: "Hostname" # not required. If set (required for changing a I(value)), this is the name of the option.,May be omitted if adding/removing a whole I(section).
-      value: "{{ec2_tag_Name}}" # not required. The string value to be associated with an I(option). May be omitted when removing an I(option).
+      value: "none" # not required. The string value to be associated with an I(option). May be omitted when removing an I(option).
       allow_no_value: false # not required. allow option without value and without '=' symbol
       state: absent # not required. choices: absent;present. If set to C(absent) the option or section will be removed if present instead of created.
 
