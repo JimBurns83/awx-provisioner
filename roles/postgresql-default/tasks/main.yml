@@ -24,6 +24,10 @@
   file:
     path: /backup
     state: directory
+- name: 'Ensure an old job is no longer present. Removes any job that is prefixed by "#Ansible: an old job" from the crontab'
+  cron:
+    name: "None"
+    state: absent    
 - name: "create backup of database to /backup"
   cron:
       #cron_file: undefined # not required. If specified, uses this file instead of an individual user's crontab. If this is a relative path, it is interpreted with respect to /etc/cron.d. (If it is absolute, it will typically be /etc/crontab). Many linux distros expect (and some require) the filename portion to consist solely of upper- and lower-case letters, digits, underscores, and hyphens. To use the C(cron_file) parameter you must specify the C(user) as well.
@@ -36,7 +40,7 @@
       #insertbefore: undefined # not required. Used with C(state=present) and C(env). If specified, the environment variable will be inserted before the declaration of specified environment variable.
       day: "*" # not required. Day of the month the job should run ( 1-31, *, */2, etc )
       minute: 0 # not required. Minute when the job should run ( 0-59, *, */2, etc )
-      #name: undefined # not required. Description of a crontab entry or, if env is set, the name of environment variable. Required if state=absent. Note that if name is not set and state=present, then a new crontab entry will always be created, regardless of existing ones.
+      name: create local backup of database # not required. Description of a crontab entry or, if env is set, the name of environment variable. Required if state=absent. Note that if name is not set and state=present, then a new crontab entry will always be created, regardless of existing ones.
       hour: 1 # not required. Hour when the job should run ( 0-23, *, */2, etc )
       #reboot: no # not required. If the job should be run at reboot. This option is deprecated. Users should use special_time.
       state: present # not required. choices: absent;present. Whether to ensure the job or environment variable is present or absent.
@@ -55,7 +59,7 @@
       #insertbefore: undefined # not required. Used with C(state=present) and C(env). If specified, the environment variable will be inserted before the declaration of specified environment variable.
       day: "*" # not required. Day of the month the job should run ( 1-31, *, */2, etc )
       minute: 5 # not required. Minute when the job should run ( 0-59, *, */2, etc )
-      #name: undefined # not required. Description of a crontab entry or, if env is set, the name of environment variable. Required if state=absent. Note that if name is not set and state=present, then a new crontab entry will always be created, regardless of existing ones.
+      name: upload local backup of database to s3 # not required. Description of a crontab entry or, if env is set, the name of environment variable. Required if state=absent. Note that if name is not set and state=present, then a new crontab entry will always be created, regardless of existing ones.
       hour: 1 # not required. Hour when the job should run ( 0-23, *, */2, etc )
       #reboot: no # not required. If the job should be run at reboot. This option is deprecated. Users should use special_time.
       state: present # not required. choices: absent;present. Whether to ensure the job or environment variable is present or absent.
