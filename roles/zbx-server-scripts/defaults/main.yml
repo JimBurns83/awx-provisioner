@@ -1,7 +1,7 @@
 ---
 # defaults file for zbx-server-scripts
 zbx_server_shell_group_name: "zabbix"
-zbx_server_shell_user_name: "zbxserver"
+zbx_server_shell_user_name: "zabbix"
 zbx_server_scripts_pip_requirements:
   - "boto3"
 zbx_server_scripts_apt_requirements: ""
